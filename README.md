@@ -22,6 +22,7 @@ xin-ideas/
 │       └── templates/          # 渲染模板（改动时只动数据对象）
 │           ├── detail.html     # 灵感详情页模板
 │           └── index.html      # 灵感索引页模板（卡片墙）
+├── xin-idea.zip                # 发布包：下载后可直接导入 agent 工具使用
 ├── README.md                   # 本文件
 ├── LICENSE                     # MIT 开源协议
 └── .gitignore                  # 排除灵感数据、打包产物、IDE/系统文件
@@ -29,8 +30,18 @@ xin-ideas/
 
 ## 🚀 安装
 
+**方式一：zip 直接导入（推荐，无需克隆仓库）**
+
+1. 下载仓库根目录的 `xin-idea.zip`
+2. 直接导入到 workbuddy 等支持 skill 的 agent 工具即可使用
+
+**方式二：复制到 skills 目录**
+
 1. 克隆或下载本仓库
-2. 将 `xin-idea/` 整个目录复制到你的 skill 目录（例如 `~/.reasonix/skills/` 或项目的 skills 目录）
+2. 将 `xin-idea/` 整个目录复制到你所用工具的 skills 目录，例如：
+   - Claude Code：`~/.claude/skills/`
+   - Codex：`~/.codex/skills/`
+   - 或你所用 agent 工具约定的 skills 目录
 3. 在对话中触发：
    - 「收集灵感」「记个想法」「灵感库」「记一笔」
    - 「做个灵感评估」「给这个想法打个分」
