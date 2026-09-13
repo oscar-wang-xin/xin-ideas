@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{TITLE}} · 灵感详情</title>
+<title>灵感详情</title>
 <style>
   :root{
     --primary:#6C63FF; --primary-2:#8B7BFF; --secondary:#3ECFCF; --accent:#FF6584;
@@ -215,6 +215,7 @@ const IDEA = {
 
 /* ===================== 渲染逻辑（一般无需改动） ===================== */
 const DIMS = Object.keys(IDEA.scores);
+document.title = IDEA.title && String(IDEA.title).trim() ? `${IDEA.title} · 灵感详情` : "灵感详情";
 const MAX = 10;
 const mean = DIMS.reduce((s,k)=>s+IDEA.scores[k],0)/DIMS.length;
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));

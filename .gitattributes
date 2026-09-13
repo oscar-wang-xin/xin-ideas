@@ -1,0 +1,6 @@
+# 统一换行符为 LF，消除跨平台 CRLF 警告
+* text=auto eol=lf
+
+# 二进制文件
+*.png binary
+*.zip binary
