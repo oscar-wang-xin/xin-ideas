@@ -37,7 +37,13 @@ xin-ideas/
 1. 下载仓库根目录的 `xin-idea.zip`
 2. 直接导入到 workbuddy 等支持 skill 的 agent 工具即可使用
 
-**方式二：复制到 skills 目录**
+**方式二：skills.sh 一键安装（需 Node.js/npx）**
+
+```bash
+npx skills add oscar-wang-xin/xin-ideas
+```
+
+**方式三：复制到 skills 目录**
 
 1. 克隆或下载本仓库
 2. 将 `xin-idea/` 整个目录复制到你所用工具的 skills 目录，例如：
@@ -125,7 +131,13 @@ xin-ideas/
 1. Download `xin-idea.zip` from the repo root
 2. Import it directly into any skill-supporting agent tool such as workbuddy
 
-**Option 2: Copy into your skills directory**
+**Option 2: Install via skills.sh (requires Node.js/npx)**
+
+```bash
+npx skills add oscar-wang-xin/xin-ideas
+```
+
+**Option 3: Copy into your skills directory**
 
 1. Clone or download this repository
 2. Copy the `xin-idea/` folder into your agent's skills directory, e.g.：
