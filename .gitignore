@@ -3,11 +3,11 @@
 /idea.html
 ideas/
 
-# ===== 打包产物（xin-idea.zip 为发布包，需随仓库维护并入库） =====
+# ===== 打包产物（xin-ideas.zip 为发布包，需随仓库维护并入库） =====
 *.zip
 *.tar.gz
 *.tgz
-!xin-idea.zip
+!xin-ideas.zip
 
 # ===== 临时文件与日志 =====
 *.log

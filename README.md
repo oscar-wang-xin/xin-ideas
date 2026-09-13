@@ -16,13 +16,13 @@
 
 ```
 xin-ideas/
-├── xin-idea/                   # skill 本体（整体复制到 skills 目录即可安装）
+├── xin-ideas/                  # skill 本体（整体复制到 skills 目录即可安装）
 │   ├── SKILL.md                # skill 定义与完整工作流（评分标准、产物约定、质量红线）
 │   └── assets/
 │       └── templates/          # 渲染模板（改动时只动数据对象）
 │           ├── detail.html     # 灵感详情页模板
 │           └── index.html      # 灵感索引页模板（卡片墙）
-├── xin-idea.zip                # 发布包：下载后可直接导入 agent 工具使用
+├── xin-ideas.zip               # 发布包：下载后可直接导入 agent 工具使用
 ├── docs/
 │   └── screenshots/            # README 效果预览截图
 ├── README.md                   # 本文件
@@ -34,7 +34,7 @@ xin-ideas/
 
 **方式一：zip 直接导入（推荐，无需克隆仓库）**
 
-1. 下载仓库根目录的 `xin-idea.zip`
+1. 下载仓库根目录的 `xin-ideas.zip`
 2. 直接导入到 workbuddy 等支持 skill 的 agent 工具即可使用
 
 **方式二：skills.sh 一键安装（需 Node.js/npx）**
@@ -46,14 +46,14 @@ npx skills add oscar-wang-xin/xin-ideas
 **方式三：复制到 skills 目录**
 
 1. 克隆或下载本仓库
-2. 将 `xin-idea/` 整个目录复制到你所用工具的 skills 目录，例如：
+2. 将 `xin-ideas/` 整个目录复制到你所用工具的 skills 目录，例如：
    - Claude Code：`~/.claude/skills/`
    - Codex：`~/.codex/skills/`
    - 或你所用 agent 工具约定的 skills 目录
 3. 在对话中触发：
    - 「收集灵感」「记个想法」「灵感库」「记一笔」
    - 「做个灵感评估」「给这个想法打个分」
-   - `xin-idea`
+   - `xin-ideas`
 
 > 依赖：需要类 Unix shell 环境支持 `date +%Y%m%d_%H%M%S` 生成时间戳；输出页面为标准 HTML，无需任何构建工具。
 
@@ -110,13 +110,13 @@ This repository contains only the skill itself and its templates — **no idea d
 
 ```
 xin-ideas/
-├── xin-idea/                   # The skill itself (copy the whole folder into your skills dir)
+├── xin-ideas/                  # The skill itself (copy the whole folder into your skills dir)
 │   ├── SKILL.md                # Skill definition & full workflow
 │   └── assets/
 │       └── templates/          # Render templates (only edit the data object)
 │           ├── detail.html     # Idea detail page template
 │           └── index.html      # Idea index/wall template
-├── xin-idea.zip                # Release package: download and import directly into agent tools
+├── xin-ideas.zip               # Release package: download and import directly into agent tools
 ├── docs/
 │   └── screenshots/            # Screenshots used in README previews
 ├── README.md
@@ -128,7 +128,7 @@ xin-ideas/
 
 **Option 1: Import the zip (recommended — no cloning needed)**
 
-1. Download `xin-idea.zip` from the repo root
+1. Download `xin-ideas.zip` from the repo root
 2. Import it directly into any skill-supporting agent tool such as workbuddy
 
 **Option 2: Install via skills.sh (requires Node.js/npx)**
@@ -140,13 +140,13 @@ npx skills add oscar-wang-xin/xin-ideas
 **Option 3: Copy into your skills directory**
 
 1. Clone or download this repository
-2. Copy the `xin-idea/` folder into your agent's skills directory, e.g.：
+2. Copy the `xin-ideas/` folder into your agent's skills directory, e.g.：
    - Claude Code：`~/.claude/skills/`
    - Codex：`~/.codex/skills/`
    - or wherever your agent expects skills
 3. Trigger it in a conversation with phrases like:
    - "collect an idea", "save this thought", "make an idea evaluation", "rate this idea"
-   - or simply `` `xin-idea` ``
+   - or simply `` `xin-ideas` ``
 
 > Requirement: a Unix-like shell supporting `date +%Y%m%d_%H%M%S` for timestamps; output is plain HTML, no build tooling needed.
 
