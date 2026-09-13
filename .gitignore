@@ -1,0 +1,25 @@
+# ===== 灵感运行时产物（含个人灵感与可能的敏感信息，永不入库） =====
+# skill 每次调用会在工作区生成这些文件，请勿提交
+/idea.html
+ideas/
+
+# ===== 打包产物 =====
+*.zip
+*.tar.gz
+*.tgz
+
+# ===== 临时文件与日志 =====
+*.log
+*.tmp
+*.swp
+*~
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== IDE / 编辑器 =====
+.idea/
+.vscode/
+*.code-workspace

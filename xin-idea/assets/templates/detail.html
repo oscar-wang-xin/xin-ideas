@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}} · 灵感详情</title>
+<style>
+  :root{
+    --primary:#6C63FF; --primary-2:#8B7BFF; --secondary:#3ECFCF; --accent:#FF6584;
+    --good:#22B8A0; --warn:#FF9F45; --bad:#FF6584;
+    --bg:#F7F8FD; --surface:#FFFFFF; --surface-2:#F4F5FC;
+    --ink:#1A1A2E; --ink-2:#5A5A7A; --line:#E8E9F5;
+    --shadow:0 6px 28px rgba(108,99,255,.10), 0 1px 3px rgba(20,20,50,.05);
+    --shadow-hover:0 14px 44px rgba(108,99,255,.16), 0 2px 6px rgba(20,20,50,.06);
+    --r:18px; --r-sm:11px;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.65;min-height:100vh;position:relative;overflow-x:hidden}
+  .bg-deco{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(620px 420px at 12% -8%, rgba(108,99,255,.16), transparent 60%),
+      radial-gradient(560px 400px at 100% 0%, rgba(62,207,207,.14), transparent 55%),
+      radial-gradient(700px 500px at 80% 110%, rgba(255,101,132,.08), transparent 60%);}
+  .wrap{position:relative;z-index:1;max-width:940px;margin:0 auto;padding:40px 22px 80px}
+
+  .reveal{opacity:0;transform:translateY(16px);animation:rise .6s cubic-bezier(.2,0,0,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  /* Hero */
+  .hero{margin-bottom:26px}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .tag{font-size:12.5px;font-weight:600;color:var(--primary);
+    background:linear-gradient(135deg,rgba(108,99,255,.12),rgba(62,207,207,.12));
+    border:1px solid rgba(108,99,255,.18);padding:5px 12px;border-radius:999px}
+  .h-title{font-size:clamp(28px,4.4vw,42px);font-weight:800;letter-spacing:-.02em;line-height:1.18}
+  .h-meta{margin-top:12px;color:var(--ink-2);font-size:14px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .h-meta .dot{width:4px;height:4px;border-radius:50%;background:var(--line)}
+  .summary{margin-top:18px;font-size:17px;color:var(--ink);background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r-sm);padding:18px 20px;box-shadow:var(--shadow)}
+
+  /* 综合评分卡 */
+  .scorecard{display:flex;align-items:center;gap:22px;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r);padding:22px 26px;margin:22px 0;box-shadow:var(--shadow)}
+  .score-num{font-size:54px;font-weight:800;letter-spacing:-.03em;line-height:1;
+    background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .score-side .grade{display:inline-block;font-size:13px;font-weight:700;color:#fff;
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));padding:3px 10px;border-radius:999px;margin-bottom:6px}
+  .score-side .sub{color:var(--ink-2);font-size:13.5px}
+  .score-bar{height:10px;border-radius:999px;background:var(--surface-2);overflow:hidden;margin-top:10px}
+  .score-bar > i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width .8s cubic-bezier(.2,0,0,1)}
+
+  /* 网格 */
+  .grid{display:grid;grid-template-columns:340px 1fr;gap:22px;margin:8px 0 30px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+  .panel h3{font-size:14px;font-weight:700;color:var(--ink-2);letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px}
+  .radar-wrap{display:flex;justify-content:center}
+  .radar text{font-size:11px;font-weight:600;fill:var(--ink)}
+  .radar .axis{stroke:var(--line);stroke-width:1}
+  .radar .grid-c{fill:none;stroke:var(--line);stroke-width:1}
+  .radar .data{fill:rgba(108,99,255,.16);stroke:var(--primary);stroke-width:2.5;stroke-linejoin:round}
+
+  .bars{display:flex;flex-direction:column;gap:14px}
+  .bar-row{display:grid;grid-template-columns:96px 1fr 38px;align-items:center;gap:12px}
+  .bar-row .name{font-size:14px;font-weight:600}
+  .bar-track{height:9px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+  .bar-track > i{display:block;height:100%;border-radius:999px;transition:width .8s cubic-bezier(.2,0,0,1)}
+  .bar-row .val{font-size:14px;font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
+
+  /* 区块标题 */
+  .section-title{font-size:20px;font-weight:800;letter-spacing:-.01em;margin:38px 0 16px;display:flex;align-items:center;gap:10px}
+  .section-title::before{content:"";width:5px;height:20px;border-radius:999px;background:linear-gradient(180deg,var(--primary),var(--secondary))}
+
+  /* 八维评价卡 */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.cards{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:18px 20px;
+    box-shadow:var(--shadow);transition:transform .2s ease,box-shadow .2s ease}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover)}
+  .card h4{font-size:15.5px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .card h4 .pill{font-size:11px;font-weight:800;color:#fff;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--primary),var(--primary-2))}
+  .card p{font-size:14.5px;color:var(--ink-2);white-space:pre-wrap}
+  .card p + p{margin-top:10px}
+
+  /* 好处 / 坏处 */
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.duo{grid-template-columns:1fr}}
+  .col{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:18px 20px;box-shadow:var(--shadow)}
+  .col h4{font-size:15.5px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .col.good h4{color:var(--good)} .col.bad h4{color:var(--bad)}
+  .ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+  .ul li{position:relative;padding-left:26px;font-size:14.5px;color:var(--ink-2)}
+  .ul li::before{position:absolute;left:0;top:1px;width:17px;height:17px;border-radius:50%;display:grid;place-items:center;
+    font-size:11px;font-weight:800;color:#fff}
+  .col.good .ul li::before{content:"✓";background:var(--good)}
+  .col.bad .ul li::before{content:"!";background:var(--bad)}
+
+  /* 问题与应对 */
+  .risks{display:flex;flex-direction:column;gap:12px}
+  .risk{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--warn);
+    border-radius:var(--r-sm);padding:16px 18px;box-shadow:var(--shadow)}
+  .risk .q{font-size:15px;font-weight:700;display:flex;gap:9px;align-items:flex-start}
+  .risk .q .ic{flex:none;color:var(--warn);font-weight:900}
+  .risk .a{margin-top:9px;font-size:14.5px;color:var(--ink-2);padding-left:26px}
+  .risk .a b{color:var(--primary);font-weight:700}
+
+  /* 路线图 */
+  .tl{position:relative;padding-left:30px}
+  .tl::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;
+    background:linear-gradient(180deg,var(--primary),var(--secondary))}
+  .tl-item{position:relative;margin-bottom:18px}
+  .tl-item:last-child{margin-bottom:0}
+  .tl-item::before{content:"";position:absolute;left:-30px;top:4px;width:16px;height:16px;border-radius:50%;
+    background:var(--surface);border:3px solid var(--primary);box-shadow:0 0 0 4px rgba(108,99,255,.10)}
+  .tl-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:16px 18px;box-shadow:var(--shadow)}
+  .tl-card .ph{display:inline-block;font-size:12px;font-weight:800;color:#fff;padding:3px 11px;border-radius:999px;margin-bottom:8px;
+    background:linear-gradient(135deg,var(--primary),var(--primary-2))}
+  .tl-card .goal{font-size:15px;font-weight:700;margin-bottom:8px}
+  .tl-card .steps{list-style:none;display:flex;flex-direction:column;gap:7px}
+  .tl-card .steps li{position:relative;padding-left:20px;font-size:14.5px;color:var(--ink-2)}
+  .tl-card .steps li::before{content:"";position:absolute;left:4px;top:8px;width:6px;height:6px;border-radius:50%;background:var(--primary-2)}
+  .tl-card .done{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13.5px;color:var(--good);font-weight:600}
+
+  /* 要避免的坑 */
+  .avoid{background:linear-gradient(180deg,rgba(255,101,132,.05),rgba(255,101,132,.02));
+    border:1px solid rgba(255,101,132,.22);border-radius:var(--r-sm);padding:20px 22px}
+  .avoid .ul li::before{content:"✕";background:var(--bad)}
+
+  /* 成功/失败判据 */
+  .metrics{display:flex;flex-direction:column;gap:10px}
+  .mrow{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r-sm);padding:14px 18px;box-shadow:var(--shadow);align-items:center}
+  .mrow .m-name{font-size:14.5px;font-weight:700}
+  .mrow .m-ok,.mrow .m-no{font-size:13.5px;display:flex;gap:7px;align-items:flex-start}
+  .mrow .m-ok{color:var(--good)} .mrow .m-no{color:var(--bad)}
+  .mrow .m-ok b,.mrow .m-no b{flex:none;font-weight:900}
+  @media(max-width:720px){.mrow{grid-template-columns:1fr;gap:6px}}
+
+  /* 成本投入 */
+  .cost{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:720px){.cost{grid-template-columns:1fr}}
+  .cost-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;box-shadow:var(--shadow);text-align:center}
+  .cost-card .cv{font-size:22px;font-weight:800;letter-spacing:-.02em;
+    background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .cost-card .cl{font-size:12.5px;font-weight:700;color:var(--ink-2);margin-top:4px;letter-spacing:.04em}
+  .cost-card .cn{font-size:12.5px;color:var(--ink-2);margin-top:7px;opacity:.85}
+  .cost-other{margin-top:12px;font-size:14px;color:var(--ink-2);background:var(--surface-2);border-radius:var(--r-sm);padding:13px 16px}
+  .cost-other b{color:var(--ink)}
+
+  .back{display:inline-flex;align-items:center;gap:7px;margin-top:40px;font-weight:700;color:var(--primary);text-decoration:none;font-size:15px;
+    background:var(--surface);border:1px solid var(--line);padding:11px 18px;border-radius:999px;box-shadow:var(--shadow);
+    transition:transform .2s ease,box-shadow .2s ease}
+  .back:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+  .foot{margin-top:28px;text-align:center;color:var(--ink-2);font-size:12.5px;opacity:.7}
+</style>
+</head>
+<body>
+<div class="bg-deco"></div>
+<main class="wrap" id="app"></main>
+
+<script>
+/* ============================================================
+   灵感详情数据对象 —— 复制模板后，只改这个对象里的字段即可。
+   评分维度固定 8 个；scores 为 1-10 整数。
+   拆解字段要求“具体可落地”，禁止只写方向与概念：
+     pros    好处（收益），字符串数组
+     cons    坏处（代价/风险），字符串数组
+     risks   可能遇到的问题，[{q:"问题", a:"应对"}]
+     roadmap 分阶段落地计划，[{phase:"阶段名", goal:"目标", steps:[...], done:"完成标志"}]
+     avoid   要避免的坑，字符串数组
+     metrics 成功/失败判据，[{name:"指标", target:"成功线", fail:"失败线"}]
+     cost    成本投入，{effort:{v,n}, time:{v,n}, money:{v,n}, other:"其它代价"}
+   ============================================================ */
+const IDEA = {
+  title: "（灵感标题）",
+  ts: "2026-01-01 00:00",
+  tags: ["分类标签", "示例"],
+  summary: "一句话讲清这个灵感解决什么、为什么值得做。",
+  scores: {
+    "解决问题": 7, "实用性": 7, "市场价值": 7, "竞品分析": 7,
+    "变现可能": 7, "技术方案": 7, "可扩展性": 7, "实现计划": 7
+  },
+  details: {
+    "解决问题": "描述它解决了什么真实痛点，谁在痛。",
+    "实用性": "在日常/工作场景中可被使用的程度与频率。",
+    "市场价值": "目标人群规模、付费意愿、市场阶段。",
+    "竞品分析": "已有玩家、他们的短板、本想法的差异化与壁垒。",
+    "变现可能": "可行的变现路径（订阅/一次性/渠道替卖等）与可行性。",
+    "技术方案": "实现思路、关键技术选型、可行性评估。",
+    "可扩展性": "未来可延展的方向、复用与组合空间。",
+    "实现计划": "分阶段落地步骤（MVP→加载背书→放大）。"
+  },
+  pros: ["收益点一（最好能算清账，如省下多少时间/多少钱）", "收益点二"],
+  cons: ["代价一（时间/金钱/精力/机会成本）", "风险点二"],
+  risks: [
+    { q: "可能遇到的问题", a: "具体应对办法" }
+  ],
+  roadmap: [
+    { phase: "第 0 步 · 验证", goal: "用最小代价判断值不值得做", steps: ["动作一", "动作二"], done: "达到什么状态算这一步完成" }
+  ],
+  avoid: ["最容易犯、且代价很高的错，一条条列清"],
+  metrics: [
+    { name: "核心指标", target: "达到即算成功的线", fail: "跌破即应止损的线" }
+  ],
+  cost: {
+    effort: { v: "约 X 人日", n: "开发和调试的精力投入" },
+    time:   { v: "X 周",     n: "从启动到可用/上线" },
+    money:  { v: "≈ ¥X",     n: "服务器、API、工具等现金支出" },
+    other:  "机会成本：这段时间挤占了哪些其他项目"
+  }
+};
+
+/* ===================== 渲染逻辑（一般无需改动） ===================== */
+const DIMS = Object.keys(IDEA.scores);
+const MAX = 10;
+const mean = DIMS.reduce((s,k)=>s+IDEA.scores[k],0)/DIMS.length;
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function grade(m){ if(m>=8.5)return"S"; if(m>=7.5)return"A"; if(m>=6.5)return"B"; if(m>=5.5)return"C"; return"D"; }
+function barColor(v){
+  if(v>=8) return "linear-gradient(90deg,#3ECFCF,#6C63FF)";
+  if(v>=6) return "linear-gradient(90deg,#8B7BFF,#6C63FF)";
+  if(v>=4) return "linear-gradient(90deg,#FFB36B,#FFA94D)";
+  return "linear-gradient(90deg,#FF8DA3,#FF6584)";
+}
+function radarSVG(){
+  const cx=180,cy=180,R=120,n=DIMS.length,step=Math.PI*2/n; let g='';
+  [2,4,6,8,10].forEach(ring=>{
+    const r=R*ring/MAX; let pts=[];
+    for(let i=0;i<n;i++){const a=-Math.PI/2+i*step;pts.push((cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1));}
+    g+=`<polygon class="grid-c" points="${pts.join(' ')}"/>`;
+  });
+  DIMS.forEach((d,i)=>{
+    const a=-Math.PI/2+i*step, x=cx+R*Math.cos(a), y=cy+R*Math.sin(a);
+    g+=`<line class="axis" x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`;
+    const lx=cx+(R+22)*Math.cos(a), ly=cy+(R+22)*Math.sin(a);
+    let anchor="middle"; if(Math.cos(a)>0.3)anchor="start"; else if(Math.cos(a)<-0.3)anchor="end";
+    g+=`<text x="${lx.toFixed(1)}" y="${(ly+4).toFixed(1)}" text-anchor="${anchor}">${esc(d)}</text>`;
+  });
+  let dp=[];
+  DIMS.forEach((d,i)=>{const a=-Math.PI/2+i*step, rr=R*IDEA.scores[d]/MAX;
+    dp.push((cx+rr*Math.cos(a)).toFixed(1)+','+(cy+rr*Math.sin(a)).toFixed(1));});
+  g+=`<polygon class="data" points="${dp.join(' ')}"/>`;
+  return `<svg class="radar" width="360" height="360" viewBox="0 0 360 360">${g}</svg>`;
+}
+const barsHTML = () => DIMS.map(d=>{const v=IDEA.scores[d];
+  return `<div class="bar-row"><span class="name">${esc(d)}</span>
+    <span class="bar-track"><i style="width:0%;background:${barColor(v)}" data-w="${(v/MAX*100).toFixed(0)}%"></i></span>
+    <span class="val">${v}</span></div>`;}).join('');
+const cardsHTML = () => DIMS.map((d,i)=>{
+  const paras=String(IDEA.details[d]||"").split(/\n\n+/).map(p=>`<p>${esc(p.trim())}</p>`).join('');
+  return `<div class="card"><h4><span class="pill">${i+1}</span>${esc(d)}</h4>${paras}</div>`;}).join('');
+
+const sec = (title, inner) => (inner && inner.trim()) ? `<div class="section-title reveal">${esc(title)}</div>${inner}` : '';
+const ulHTML = arr => (arr&&arr.length) ? `<ul class="ul">${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>` : '';
+
+function render(){
+  const dua = (IDEA.pros&&IDEA.pros.length)||(IDEA.cons&&IDEA.cons.length) ? `
+    <div class="duo reveal">
+      <div class="col good"><h4>👍 好处（值不值得做的理由）</h4>${ulHTML(IDEA.pros)}</div>
+      <div class="col bad"><h4>⚠️ 坏处与代价</h4>${ulHTML(IDEA.cons)}</div>
+    </div>` : '';
+
+  const risksH = (IDEA.risks&&IDEA.risks.length) ? `<div class="risks reveal">${IDEA.risks.map(r=>`
+    <div class="risk"><div class="q"><span class="ic">?</span><span>${esc(r.q)}</span></div>
+    <div class="a"><b>应对：</b>${esc(r.a)}</div></div>`).join('')}</div>` : '';
+
+  const roadH = (IDEA.roadmap&&IDEA.roadmap.length) ? `<div class="tl reveal">${IDEA.roadmap.map(m=>`
+    <div class="tl-item"><div class="tl-card"><span class="ph">${esc(m.phase)}</span>
+      <div class="goal">${esc(m.goal)}</div>
+      <ul class="steps">${(m.steps||[]).map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
+      ${m.done?`<div class="done">✔ 完成标志：${esc(m.done)}</div>`:''}
+    </div></div>`).join('')}</div>` : '';
+
+  const avoidH = (IDEA.avoid&&IDEA.avoid.length) ? `<div class="avoid reveal">${ulHTML(IDEA.avoid)}</div>` : '';
+
+  const metH = (IDEA.metrics&&IDEA.metrics.length) ? `<div class="metrics reveal">${IDEA.metrics.map(m=>`
+    <div class="mrow"><span class="m-name">${esc(m.name)}</span>
+      <span class="m-ok"><b>✔</b><span>成功线：${esc(m.target)}</span></span>
+      <span class="m-no"><b>✕</b><span>止损线：${esc(m.fail)}</span></span></div>`).join('')}</div>` : '';
+
+  const c = IDEA.cost||{};
+  const costH = (c.effort||c.time||c.money) ? `
+    <div class="cost reveal">
+      ${c.effort?`<div class="cost-card"><div class="cv">${esc(c.effort.v)}</div><div class="cl">精力</div><div class="cn">${esc(c.effort.n||'')}</div></div>`:''}
+      ${c.time?`<div class="cost-card"><div class="cv">${esc(c.time.v)}</div><div class="cl">时间</div><div class="cn">${esc(c.time.n||'')}</div></div>`:''}
+      ${c.money?`<div class="cost-card"><div class="cv">${esc(c.money.v)}</div><div class="cl">金钱</div><div class="cn">${esc(c.money.n||'')}</div></div>`:''}
+    </div>${c.other?`<div class="cost-other reveal"><b>其它代价：</b>${esc(c.other)}</div>`:''}` : '';
+
+  document.getElementById('app').innerHTML = `
+    <header class="hero reveal">
+      <div class="tags">${IDEA.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <h1 class="h-title">${esc(IDEA.title)}</h1>
+      <div class="h-meta"><span>🕒 ${esc(IDEA.ts)}</span><span class="dot"></span><span>综合评分 ${mean.toFixed(1)} / 10</span></div>
+      <div class="summary">${esc(IDEA.summary)}</div>
+    </header>
+    <div class="scorecard reveal" style="animation-delay:.05s">
+      <div class="score-num">${mean.toFixed(1)}</div>
+      <div class="score-side">
+        <span class="grade">${grade(mean)} 级</span>
+        <div class="sub">综合评分 · 满分 10 · 基于 ${DIMS.length} 个维度均值</div>
+        <div class="score-bar"><i style="width:0%" data-w="${(mean/MAX*100).toFixed(0)}%"></i></div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="panel reveal" style="animation-delay:.1s"><h3>维度雷达</h3><div class="radar-wrap">${radarSVG()}</div></div>
+      <div class="panel reveal" style="animation-delay:.15s"><h3>分项评分</h3><div class="bars">${barsHTML()}</div></div>
+    </div>
+    ${sec("八维深度评价", `<div class="cards reveal" style="animation-delay:.05s">${cardsHTML()}</div>`)}
+    ${sec("收益 vs 代价", dua)}
+    ${sec("可能遇到的问题与应对", risksH)}
+    ${sec("落地路线图", roadH)}
+    ${sec("要避免的坑", avoidH)}
+    ${sec("成功 / 失败判据（随时可评判）", metH)}
+    ${sec("成本投入", costH)}
+    <a class="back" href="../idea.html">← 返回灵感库</a>
+    <div class="foot">由 xin-idea skill 生成 · 灵感不做评判，只做体检</div>
+  `;
+  requestAnimationFrame(()=>{document.querySelectorAll('[data-w]').forEach(el=>{el.style.width=el.getAttribute('data-w');});});
+}
+render();
+</script>
+</body>
+</html>
