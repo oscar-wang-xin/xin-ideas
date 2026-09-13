@@ -69,3 +69,76 @@ xin-ideas/
 ## 📄 许可证
 
 [MIT](LICENSE) © 2026 xin-ideas contributors
+
+---
+
+# xin-ideas · Idea Health Check & Actionable Breakdown (English)
+
+> Toss an idea in — examine it first, build later. An open-source skill that runs every idea through an 8-dimension scorecard plus an actionable breakdown, producing beautiful, fully static, offline HTML detail pages and a searchable idea wall.
+
+This repository contains only the skill itself and its templates — **no idea data**. Your ideas live exclusively in your local workspace.
+
+## ✨ Features
+
+- **8-dimension scoring (1–10)**：Problem-solving / Practicality / Market value / Competitive analysis / Monetization / Technical feasibility / Scalability / Implementation plan, graded S/A/B/C/D by average
+- **Actionable breakdown**：benefits & costs, risks & mitigations, phased roadmap, pitfalls to avoid, quantified success/failure criteria, and cost estimates (effort/time/money) — "another person could start working from this breakdown"
+- **Beautiful self-contained pages**：radar chart (inline SVG), per-dimension score bars, roadmap timeline, criteria table, cost cards; zero CDN, zero external requests, fully static and offline
+- **Idea wall**：real-time search, multiple sort orders, click-through to detail
+- **Privacy-friendly**：idea data is generated locally at runtime and excluded by default via `.gitignore`
+
+## 📁 Directory Structure
+
+```
+xin-ideas/
+├── xin-idea/                   # The skill itself (copy the whole folder into your skills dir)
+│   ├── SKILL.md                # Skill definition & full workflow
+│   └── assets/
+│       └── templates/          # Render templates (only edit the data object)
+│           ├── detail.html     # Idea detail page template
+│           └── index.html      # Idea index/wall template
+├── xin-idea.zip                # Release package: download and import directly into agent tools
+├── README.md
+├── LICENSE                     # MIT License
+└── .gitignore
+```
+
+## 🚀 Installation
+
+**Option 1: Import the zip (recommended — no cloning needed)**
+
+1. Download `xin-idea.zip` from the repo root
+2. Import it directly into any skill-supporting agent tool such as workbuddy
+
+**Option 2: Copy into your skills directory**
+
+1. Clone or download this repository
+2. Copy the `xin-idea/` folder into your agent's skills directory, e.g.：
+   - Claude Code：`~/.claude/skills/`
+   - Codex：`~/.codex/skills/`
+   - or wherever your agent expects skills
+3. Trigger it in a conversation with phrases like:
+   - "collect an idea", "save this thought", "make an idea evaluation", "rate this idea"
+   - or simply `` `xin-idea` ``
+
+> Requirement: a Unix-like shell supporting `date +%Y%m%d_%H%M%S` for timestamps; output is plain HTML, no build tooling needed.
+
+## 📝 Usage
+
+Once invoked, the skill runs in your **current workspace** and produces:
+
+| Artifact | Location | Description |
+|----------|----------|-------------|
+| Idea detail page | `ideas/idea_<timestamp>.html` | 8-dimension scores + full breakdown |
+| Idea index page | `idea.html` (workspace root) | Card wall with search / sort / navigation |
+
+Every idea includes: a one-line takeaway, 8-dimension scores and reviews, benefits vs. costs, risks & mitigations, a phased roadmap, pitfalls to avoid, quantified success/failure criteria, and cost magnitude.
+
+## 🔒 Privacy
+
+- **Your idea data (the `ideas/` folder and `idea.html` at the workspace root) is a runtime artifact and may contain personal or sensitive thoughts** — it is already covered by `.gitignore` and will never be committed.
+- This repository contains only skill instructions and templates — no real idea data, safe to open-source.
+- All pages are fully static with zero external network requests; data stays in your local workspace and is never uploaded anywhere.
+
+## 📄 License
+
+[MIT](LICENSE) © 2026 xin-ideas contributors
