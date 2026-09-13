@@ -24,3 +24,6 @@ desktop.ini
 .idea/
 .vscode/
 *.code-workspace
+
+# ===== 运行附件（截图/剪贴板等临时素材，勿入库） =====
+.reasonix/
