@@ -10,6 +10,9 @@
 - **可落地拆解**：好处与代价、问题与应对、分阶段路线图、要避免的坑、量化成功/失败判据、成本投入（精力/时间/金钱），标准是「照着拆解，另一个人也能开工」
 - **精美自包含页面**：雷达图（内联 SVG）、分项打分条、时间线路线图、判据表、成本卡；零 CDN、零外部请求，纯静态离线可用
 - **灵感卡片墙**：实时搜索、多维度排序、点击跳转详情
+- **原话留痕**：每个灵感忠实记录你的原始表达；详情页原话引用块，列表卡片「原话」标签悬停或点击即时回看
+- **深浅色主题**：右下角一键切换，默认浅色并记住偏好
+- **移动端优先**：单栏布局、大触控目标、安全区适配，手机浏览体验优先
 - **隐私友好**：灵感数据为本地运行时产物，已默认被 `.gitignore` 排除
 
 ## 📁 目录结构
@@ -66,15 +69,15 @@ npx skills add oscar-wang-xin/xin-ideas
 | 灵感详情页 | `.xin-ideas/idea_<时间戳>.html` | 八维评分 + 完整拆解 |
 | 灵感索引页 | `idea.html`（工作区根目录） | 卡片墙，支持搜索/排序/跳转 |
 
-每个灵感包含：一句话结论、八维分数与评价、收益 vs 代价、问题与应对、落地路线图、要避的坑、量化判据、成本量级。
+每个灵感包含：原话引用、一句话结论、八维分数与评价、收益 vs 代价、问题与应对、落地路线图、要避的坑、量化判据、成本量级。
 
 **效果预览**
 
-`idea.html` 灵感库索引页（搜索、排序、跳转详情）：
+`idea.html` 灵感库索引页（搜索、排序、跳转详情，「原话」标签悬停或点击查看原话）：
 
 <img src="docs/screenshots/index.png" alt="灵感库索引页（idea.html）" width="720">
 
-`.xin-ideas/idea_<时间戳>.html` 灵感详情页（雷达图、分项评分、完整拆解）：
+`.xin-ideas/idea_<时间戳>.html` 灵感详情页（原话引用、雷达图、分项评分、完整拆解）：
 
 <img src="docs/screenshots/detail.png" alt="灵感详情页（.xin-ideas/idea_时间戳.html）" width="720">
 
@@ -104,6 +107,9 @@ This repository contains only the skill itself and its templates — **no idea d
 - **Actionable breakdown**：benefits & costs, risks & mitigations, phased roadmap, pitfalls to avoid, quantified success/failure criteria, and cost estimates (effort/time/money) — "another person could start working from this breakdown"
 - **Beautiful self-contained pages**：radar chart (inline SVG), per-dimension score bars, roadmap timeline, criteria table, cost cards; zero CDN, zero external requests, fully static and offline
 - **Idea wall**：real-time search, multiple sort orders, click-through to detail
+- **Raw idea capture**：every idea keeps your original words; a quote block on the detail page and a hover/tap "原话" tag on cards
+- **Light / dark theme**：one-tap toggle at the bottom-right, defaults to light and remembers your choice
+- **Mobile-first**：single-column layout, large touch targets, safe-area aware, tuned for phone browsing
 - **Privacy-friendly**：idea data is generated locally at runtime and excluded by default via `.gitignore`
 
 ## 📁 Directory Structure
@@ -159,15 +165,15 @@ Once invoked, the skill runs in your **current workspace** and produces:
 | Idea detail page | `.xin-ideas/idea_<timestamp>.html` | 8-dimension scores + full breakdown |
 | Idea index page | `idea.html` (workspace root) | Card wall with search / sort / navigation |
 
-Every idea includes: a one-line takeaway, 8-dimension scores and reviews, benefits vs. costs, risks & mitigations, a phased roadmap, pitfalls to avoid, quantified success/failure criteria, and cost magnitude.
+Every idea includes: the original raw words, a one-line takeaway, 8-dimension scores and reviews, benefits vs. costs, risks & mitigations, a phased roadmap, pitfalls to avoid, quantified success/failure criteria, and cost magnitude.
 
 **Preview**
 
-`idea.html` — the idea wall (search, sort, click-through):
+`idea.html` — the idea wall (search, sort, click-through; hover or tap the "原话" tag to see the raw words):
 
 <img src="docs/screenshots/index.png" alt="Idea wall (idea.html)" width="720">
 
-`.xin-ideas/idea_<timestamp>.html` — the idea detail page (radar chart, dimension scores, full breakdown):
+`.xin-ideas/idea_<timestamp>.html` — the idea detail page (raw quote, radar chart, dimension scores, full breakdown):
 
 <img src="docs/screenshots/detail.png" alt="Idea detail page (.xin-ideas/idea_timestamp.html)" width="720">
 
