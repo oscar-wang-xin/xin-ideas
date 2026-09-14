@@ -101,8 +101,8 @@ try{
 
   /* 原话标签 + Tip */
   .c-raw{position:relative;margin-top:10px;align-self:flex-start}
-  .raw-tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--primary);
-    background:rgba(108,99,255,.10);border:1px solid rgba(108,99,255,.22);padding:5px 12px;border-radius:999px;
+  .raw-tag{display:inline-flex;align-items:center;gap:5px;min-height:44px;font-size:12px;font-weight:700;color:var(--primary);
+    background:rgba(108,99,255,.10);border:1px solid rgba(108,99,255,.22);padding:6px 14px;border-radius:999px;
     cursor:pointer;user-select:none;transition:background .18s ease,color .18s ease}
   .raw-tag:hover{background:rgba(108,99,255,.18)}
   .raw-tag:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
@@ -213,7 +213,7 @@ function cardColor(v){
   if(v>=4) return "linear-gradient(135deg,#FFB36B,#FFA94D)";
   return "linear-gradient(135deg,#FF8DA3,#FF6584)";
 }
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
 const rawBlock = it => (it.raw && String(it.raw).trim()) ? `
   <div class="c-raw">
@@ -228,7 +228,7 @@ function render(){
   const kw=q.value.trim().toLowerCase();
   let list=IDEAS.filter(it=>{
     if(!kw) return true;
-    return (it.title+it.summary+(it.raw||'')+it.tags.join(' ')).toLowerCase().includes(kw);
+    return (it.title+it.summary+(it.raw||'')+(it.tags||[]).join(' ')).toLowerCase().includes(kw);
   });
   const s=sort.value;
   list.sort((a,b)=>{
@@ -239,13 +239,13 @@ function render(){
   });
 
   grid.innerHTML=list.map((it,i)=>`
-    <a class="card" href="${it.file}" style="animation-delay:${i*0.05}s">
+    <a class="card" href="${esc(it.file)}" style="animation-delay:${i*0.05}s">
       <div class="c-top">
         <div class="c-title">${esc(it.title)}</div>
-        <div class="c-score" style="background:${cardColor(it.score)}">${it.score.toFixed(1)}</div>
+        <div class="c-score" style="background:${cardColor(it.score)}">${(Number(it.score)||0).toFixed(1)}</div>
       </div>
       <div class="c-sum">${esc(it.summary)}</div>
-      <div class="c-tags">${it.tags.map(t=>`<span class="c-tag">${esc(t)}</span>`).join('')}</div>
+      <div class="c-tags">${(it.tags||[]).map(t=>`<span class="c-tag">${esc(t)}</span>`).join('')}</div>
       ${rawBlock(it)}
       <div class="c-foot">
         <span class="m-item">
@@ -281,9 +281,9 @@ grid.addEventListener('keydown',e=>{
 
 // 统计
 document.getElementById('stat-count').textContent=IDEAS.length;
-const avg=IDEAS.reduce((s,i)=>s+i.score,0)/(IDEAS.length||1);
+const avg=IDEAS.reduce((s,i)=>s+Number(i.score),0)/(IDEAS.length||1);
 document.getElementById('stat-avg').textContent=avg.toFixed(1);
-document.getElementById('stat-top').textContent=IDEAS.length?Math.max(...IDEAS.map(i=>i.score)).toFixed(1):'—';
+document.getElementById('stat-top').textContent=IDEAS.length?Math.max(...IDEAS.map(i=>Number(i.score))).toFixed(1):'—';
 
 q.addEventListener('input',render);
 sort.addEventListener('change',render);

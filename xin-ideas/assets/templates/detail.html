@@ -279,7 +279,7 @@ const DIMS = Object.keys(IDEA.scores);
 document.title = IDEA.title && String(IDEA.title).trim() ? `${IDEA.title} · 灵感详情` : "灵感详情";
 const MAX = 10;
 const mean = DIMS.reduce((s,k)=>s+IDEA.scores[k],0)/DIMS.length;
-const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* 主题切换 */
 (function(){
@@ -374,7 +374,7 @@ function render(){
 
   document.getElementById('app').innerHTML = `
     <header class="hero reveal">
-      <div class="tags">${IDEA.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <div class="tags">${(IDEA.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
       <h1 class="h-title">${esc(IDEA.title)}</h1>
       <div class="h-meta">
         <span class="m-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>${esc(IDEA.ts)}</span>

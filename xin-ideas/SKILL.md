@@ -67,7 +67,7 @@ description: "灵感收集与多维度体检 + 可落地拆解工具。当用户
 3. 不要改动其余 CSS/JS 与渲染逻辑。缺失字段对应板块会自动隐藏。
 
 ### 5. 更新索引页
-- 若 `.xin-ideas/index.html` 不存在：复制 `assets/templates/index.html` 到 `.xin-ideas/index.html`（保留模板原名）。
+- 若 `.xin-ideas/index.html` 不存在：复制 `assets/templates/index.html` 到 `.xin-ideas/index.html`（保留模板原名）。**模板自带一条 `example` 示例项，首次复制后必须删除或替换为真实灵感**，否则索引页会常驻示例卡片且指向不存在的 `ideas/idea_example.html` 死链。
 - 在 `.xin-ideas/index.html` 末尾 `<script>` 的 `IDEAS` 数组里追加一项：
   ```js
   { id:"<时间戳>", title:"...", ts:"YYYY-MM-DD HH:MM", tags:["..."],

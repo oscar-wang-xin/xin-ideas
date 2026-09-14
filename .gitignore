@@ -1,6 +1,8 @@
 # ===== 灵感运行时产物（含个人灵感与可能的敏感信息，永不入库） =====
 # skill 会在选定的目录生成整个 .xin-ideas/（含 index.html 与 ideas/ 子目录），请勿提交
 .xin-ideas/
+# skill 目录内的状态文件（记录 .xin-ideas/ 路径，含本地绝对路径），勿入库
+.xin-ideas-path
 
 # ===== 打包产物（xin-ideas.zip 为发布包，需随仓库维护并入库） =====
 *.zip
