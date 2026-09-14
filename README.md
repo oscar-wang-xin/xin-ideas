@@ -62,30 +62,32 @@ npx skills add oscar-wang-xin/xin-ideas
 
 ## 📝 使用
 
-调用 skill 后，它会在**当前工作区**自动完成：
+调用 skill 后，它会在**选定的 `.xin-ideas/` 目录**内自动完成（首次使用会弹窗确认目录创建位置，默认为本 skill 安装目录，之后可随时更换）：
 
 | 产物 | 位置 | 说明 |
 |------|------|------|
-| 灵感详情页 | `.xin-ideas/idea_<时间戳>.html` | 八维评分 + 完整拆解 |
-| 灵感索引页 | `idea.html`（工作区根目录） | 卡片墙，支持搜索/排序/跳转 |
+| 灵感索引页 | `.xin-ideas/index.html` | 卡片墙，支持搜索/排序/跳转 |
+| 灵感明细页 | `.xin-ideas/ideas/idea_<时间戳>.html` | 八维评分 + 完整拆解 |
+
+> 所有产物集中在 `.xin-ideas/` 一个目录内，复制整个目录即可完成备份或迁移。
 
 每个灵感包含：原话引用、一句话结论、八维分数与评价、收益 vs 代价、问题与应对、落地路线图、要避的坑、量化判据、成本量级。
 
 **效果预览**
 
-`idea.html` 灵感库索引页（搜索、排序、跳转详情，「原话」标签悬停或点击查看原话）：
+`.xin-ideas/index.html` 灵感库索引页（搜索、排序、跳转详情，「原话」标签悬停或点击查看原话）：
 
-<img src="docs/screenshots/index.png" alt="灵感库索引页（idea.html）" width="720">
+<img src="docs/screenshots/index.png" alt="灵感库索引页（.xin-ideas/index.html）" width="720">
 
-`.xin-ideas/idea_<时间戳>.html` 灵感详情页（原话引用、雷达图、分项评分、完整拆解）：
+`.xin-ideas/ideas/idea_<时间戳>.html` 灵感明细页（原话引用、雷达图、分项评分、完整拆解）：
 
-<img src="docs/screenshots/detail.png" alt="灵感详情页（.xin-ideas/idea_时间戳.html）" width="720">
+<img src="docs/screenshots/detail.png" alt="灵感明细页（.xin-ideas/ideas/idea_时间戳.html）" width="720">
 
 > 截图为模板示例数据，非真实灵感。
 
 ## 🔒 隐私说明
 
-- **灵感数据（`.xin-ideas/` 目录与根目录 `idea.html`）是你的运行时产物，可能包含个人想法与敏感信息**，已写入 `.gitignore`，不会被 `git add`/提交。
+- **灵感数据（`.xin-ideas/` 目录，含 `index.html` 与 `ideas/` 子目录）是你的运行时产物，可能包含个人想法与敏感信息**，已写入 `.gitignore`，不会被 `git add`/提交。
 - 本仓库仅含 skill 指令与模板文件，不含任何真实灵感数据，可放心开源。
 - 所有页面均为纯静态、零外部网络请求，数据只存于你的本地工作区，不上传任何服务器。
 
@@ -158,30 +160,32 @@ npx skills add oscar-wang-xin/xin-ideas
 
 ## 📝 Usage
 
-Once invoked, the skill runs in your **current workspace** and produces:
+Once invoked, the skill produces everything inside the chosen `.xin-ideas/` folder (the first use asks where to create it, defaulting to the skill install directory):
 
 | Artifact | Location | Description |
 |----------|----------|-------------|
-| Idea detail page | `.xin-ideas/idea_<timestamp>.html` | 8-dimension scores + full breakdown |
-| Idea index page | `idea.html` (workspace root) | Card wall with search / sort / navigation |
+| Idea index page | `.xin-ideas/index.html` | Card wall with search / sort / navigation |
+| Idea detail page | `.xin-ideas/ideas/idea_<timestamp>.html` | 8-dimension scores + full breakdown |
+
+> All artifacts live in the single `.xin-ideas/` folder; copy the whole folder to back up or migrate.
 
 Every idea includes: the original raw words, a one-line takeaway, 8-dimension scores and reviews, benefits vs. costs, risks & mitigations, a phased roadmap, pitfalls to avoid, quantified success/failure criteria, and cost magnitude.
 
 **Preview**
 
-`idea.html` — the idea wall (search, sort, click-through; hover or tap the "原话" tag to see the raw words):
+`.xin-ideas/index.html` — the idea wall (search, sort, click-through; hover or tap the "原话" tag to see the raw words):
 
-<img src="docs/screenshots/index.png" alt="Idea wall (idea.html)" width="720">
+<img src="docs/screenshots/index.png" alt="Idea wall (.xin-ideas/index.html)" width="720">
 
-`.xin-ideas/idea_<timestamp>.html` — the idea detail page (raw quote, radar chart, dimension scores, full breakdown):
+`.xin-ideas/ideas/idea_<timestamp>.html` — the idea detail page (raw quote, radar chart, dimension scores, full breakdown):
 
-<img src="docs/screenshots/detail.png" alt="Idea detail page (.xin-ideas/idea_timestamp.html)" width="720">
+<img src="docs/screenshots/detail.png" alt="Idea detail page (.xin-ideas/ideas/idea_timestamp.html)" width="720">
 
 > Screenshots show template placeholder data, not real ideas.
 
 ## 🔒 Privacy
 
-- **Your idea data (the `.xin-ideas/` folder and `idea.html` at the workspace root) is a runtime artifact and may contain personal or sensitive thoughts** — it is already covered by `.gitignore` and will never be committed.
+- **Your idea data (the `.xin-ideas/` folder, including `index.html` and the `ideas/` subfolder) is a runtime artifact and may contain personal or sensitive thoughts** — it is already covered by `.gitignore` and will never be committed.
 - This repository contains only skill instructions and templates — no real idea data, safe to open-source.
 - All pages are fully static with zero external network requests; data stays in your local workspace and is never uploaded anywhere.
 
