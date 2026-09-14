@@ -202,19 +202,21 @@ const sort=document.getElementById('sort');
 /* 可拖动浮层按钮：拖拽贴边吸附、边界限制、resize 重钳位；非拖动松手派发 tap */
 function makeDraggable(el,{bottomSafe=0}={}){
   const EDGE=8, DRAG_TOL=5;
-  let drag=null, moved=false;
+  let drag=null, moved=false, suppressClick=false;
   function clamp(v,min,max){ return Math.min(Math.max(v,min),max); }
+  function pxPos(v){ const n=parseFloat(v); return isNaN(n)?null:n; }
   function reClamp(){
-    if(el.style.left==='') return; // 未拖过：保持 CSS right/bottom 定位
+    const l=pxPos(el.style.left);
+    if(l===null) return; // 未拖过：保持 CSS right/bottom 定位
     const w=el.offsetWidth, h=el.offsetHeight;
-    el.style.left=clamp(parseFloat(el.style.left)||0,0,innerWidth-w-EDGE)+'px';
-    el.style.top =clamp(parseFloat(el.style.top)||0,0,innerHeight-h-bottomSafe-EDGE)+'px';
+    el.style.left=clamp(l,0,innerWidth-w-EDGE)+'px';
+    el.style.top =clamp(pxPos(el.style.top)||0,0,innerHeight-h-bottomSafe-EDGE)+'px';
   }
   window.addEventListener('resize',reClamp,{passive:true});
   el.addEventListener('pointerdown',e=>{
     drag={ sx:e.clientX, sy:e.clientY,
-           ox:parseFloat(el.style.left)||el.offsetLeft,
-           oy:parseFloat(el.style.top)||el.offsetTop };
+           ox:pxPos(el.style.left)??el.offsetLeft,
+           oy:pxPos(el.style.top)??el.offsetTop };
     moved=false;
     try{ el.setPointerCapture(e.pointerId); }catch(err){}
   });
@@ -232,20 +234,26 @@ function makeDraggable(el,{bottomSafe=0}={}){
   });
   function finish(){
     if(!drag) return;
+    drag=null; moved=false;
     el.classList.remove('dragging');
+    suppressClick=true; // pointerup 伴随的 click 由本路径消化，防键盘/指针双触发
     if(!moved){
       el.dispatchEvent(new CustomEvent('tap'));
     }else{
       const w=el.offsetWidth, h=el.offsetHeight;
-      const x=parseFloat(el.style.left)||0;
-      const y=parseFloat(el.style.top)||0;
+      const x=pxPos(el.style.left)||0;
+      const y=pxPos(el.style.top)||0;
       el.style.left=(x<innerWidth/2?EDGE:innerWidth-w-EDGE)+'px';
       el.style.top =clamp(y,0,innerHeight-h-bottomSafe-EDGE)+'px';
     }
-    drag=null;
   }
   el.addEventListener('pointerup',finish);
   el.addEventListener('pointercancel',()=>{ drag=null; moved=false; el.classList.remove('dragging'); });
+  /* 键盘/辅助激活：Enter/Space 只产生原生 click（无 pointer 序列），兜底派发 tap */
+  el.addEventListener('click',()=>{
+    if(suppressClick){ suppressClick=false; return; }
+    el.dispatchEvent(new CustomEvent('tap'));
+  });
 }
 
 /* 主题切换（按钮可拖动，拖完不误触） */
