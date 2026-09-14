@@ -15,6 +15,7 @@ description: "灵感收集与多维度体检 + 可落地拆解工具。当用户
   - `.xin-ideas/index.html`：索引页（灵感卡片墙），即模板原名 `index.html`，无需改名
   - `.xin-ideas/ideas/idea_<时间戳>.html`：每个灵感一个明细页
 - 时间戳格式：`YYYYMMDD_HHMMSS`（用 `date +%Y%m%d_%H%M%S` 取本地时间）
+- **最高原则：绝不覆盖、绝不丢失已有内容**。只要目标 `.xin-ideas/` 已存在（有 `index.html` 或 `ideas/`），一律在此基础上增量新增；确需重建 `index.html` 时，必须先备份原文件、提取原有全部灵感后重建。已有明细页文件永不改写。
 
 ## 工作流
 
@@ -56,7 +57,7 @@ description: "灵感收集与多维度体检 + 可落地拆解工具。当用户
 - **cost 成本投入**：`{effort:{v,n}, time:{v,n}, money:{v,n}, other}` —— 精力（人日）、时间（周期）、金钱（量级/预算）、其它代价（机会成本等）。
 
 ### 4. 生成明细页
-1. 复制 `assets/templates/detail.html` 到 `.xin-ideas/ideas/idea_<时间戳>.html`（若无 `ideas/` 子目录先创建）
+1. 复制 `assets/templates/detail.html` 到 `.xin-ideas/ideas/idea_<时间戳>.html`（若无 `ideas/` 子目录先创建）。**若同名文件已存在（时间戳冲突）：改用新时间戳或追加后缀（如 `idea_<时间戳>_2.html`），绝不覆盖已有明细页。**
 2. 只改文件末尾 `<script>` 里的 `IDEA` 对象字段（结构见模板顶部注释）：
    - `raw`：用户原话（字符串；缺失或为空时原话板块自动隐藏）
    - `title` / `ts` / `tags`（数组，如 `["工具","AI","内容线"]`）/ `summary`（一句话结论）
@@ -66,14 +67,21 @@ description: "灵感收集与多维度体检 + 可落地拆解工具。当用户
    - `cost`：`{effort,time,money,other}`
 3. 不要改动其余 CSS/JS 与渲染逻辑。缺失字段对应板块会自动隐藏。
 
-### 5. 更新索引页
-- 若 `.xin-ideas/index.html` 不存在：复制 `assets/templates/index.html` 到 `.xin-ideas/index.html`（保留模板原名）。**模板自带一条 `example` 示例项，首次复制后必须删除或替换为真实灵感**，否则索引页会常驻示例卡片且指向不存在的 `ideas/idea_example.html` 死链。
-- 在 `.xin-ideas/index.html` 末尾 `<script>` 的 `IDEAS` 数组里追加一项：
+### 5. 更新索引页（增量优先，绝不覆盖）
+- 若 `.xin-ideas/index.html` 不存在：复制 `assets/templates/index.html` 到 `.xin-ideas/index.html`（保留模板原名），并**删除或替换模板自带的 `example` 示例项**（否则会常驻示例卡片并指向不存在的 `ideas/idea_example.html` 死链）。
+- 若 `.xin-ideas/index.html` 已存在：**先完整读取原文件**，区分两种情况：
+  1. **结构一致**（能解析出 `const IDEAS = [...]` 数组，且每条含 `file:` 字段）：在原数组末尾**追加**新条目，**保留全部原有条目**，只增不删；同一 `id` 已存在则跳过（不重复添加）。统计数字由脚本自动重算。
+  2. **结构不一致或解析失败**（旧版文件、模板大版本升级、或被人为改动）：
+     a. 将原文件**原样、逐字节备份**为 `.xin-ideas/index.html.bak`（不做任何修改）；
+     b. 从备份中**提取全部原有灵感条目**——至少提取每条 `file` 链接，尽可能完整保留 `id/title/ts/tags/score/raw/summary`；
+     c. 基于模板重新生成 `.xin-ideas/index.html`：原有条目（保留原 `id` 与原 `file` 路径，指向原有 `ideas/` 明细页）+ 新条目一并写入。
+- **自查（必做）**：更新/重建完成后，逐一核对 `ideas/` 下的每个明细页都仍被 `index.html` 的 `IDEAS` 引用、且引用路径与文件名一致——原有灵感一条不能少、链接不能断。
+- 追加/写入条目的字段与路径：
   ```js
   { id:"<时间戳>", title:"...", ts:"YYYY-MM-DD HH:MM", tags:["..."],
     score:<综合均分>, raw:"用户原话…", summary:"...", file:"ideas/idea_<时间戳>.html" }
   ```
-- `score` 即步骤 2 的综合评分；`file` 为相对索引页（`.xin-ideas/index.html`）的路径，指向 `ideas/` 子目录。`raw` 为原话（与明细页一致），驱动卡片「原话」标签：悬停卡片或用键盘聚焦标签即显示 tip，点击标签可固定展开（移动端无悬停，点击查看）；可为空字符串。统计数字由脚本自动重算。
+- `score` 即步骤 2 的综合评分；`file` 为相对索引页（`.xin-ideas/index.html`）的路径，指向 `ideas/` 子目录。`raw` 为原话（与明细页一致），驱动卡片「原话」标签：悬停卡片或用键盘聚焦标签即显示 tip，点击标签可固定展开（移动端无悬停，点击查看）；可为空字符串。
 
 ### 6. 反馈用户
 告知：已归档、综合评分与评级、一句话结论、以及成本量级与最主要的一条判据；提示打开 `.xin-ideas/index.html` 可搜索/排序/点开详情、原话可悬停或点击查看。不要替用户决定要不要做，只给体检 + 拆解报告。
