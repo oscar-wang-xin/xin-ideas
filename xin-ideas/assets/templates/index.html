@@ -240,7 +240,7 @@ function render(){
   });
 
   grid.innerHTML=list.map((it,i)=>`
-    <a class="card" href="${esc(it.file)}" style="animation-delay:${i*0.05}s">
+    <a class="card" href="${esc(it.file)}" target="_blank" rel="noopener" style="animation-delay:${i*0.05}s">
       <div class="c-top">
         <div class="c-title">${esc(it.title)}</div>
         <div class="c-score" style="background:${cardColor(it.score)}">${(Number(it.score)||0).toFixed(1)}</div>
