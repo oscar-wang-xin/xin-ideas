@@ -10,9 +10,11 @@
 - **可落地拆解**：好处与代价、问题与应对、分阶段路线图、要避免的坑、量化成功/失败判据、成本投入（精力/时间/金钱），标准是「照着拆解，另一个人也能开工」
 - **精美自包含页面**：雷达图（内联 SVG）、分项打分条、时间线路线图、判据表、成本卡；零 CDN、零外部请求，纯静态离线可用
 - **灵感卡片墙**：实时搜索、多维度排序、点击跳转详情
-- **原话留痕**：每个灵感忠实记录你的原始表达；详情页原话引用块，列表卡片「原话」标签悬停或点击即时回看
+- **原话留痕**：每个灵感忠实记录你的原始表达；明细页原话引用块，列表卡片「原话」标签悬停、聚焦或点击即时回看
 - **深浅色主题**：右下角一键切换，默认浅色并记住偏好
 - **移动端优先**：单栏布局、大触控目标、安全区适配，手机浏览体验优先
+- **顺手的小交互**：卡片在新标签页打开明细、明细页一键关闭、可拖动的「返回顶部」浮动按钮（随手拖开，不遮挡内容）
+- **增量维护**：复用同一个 `.xin-ideas/` 目录时只增不删，绝不覆盖或丢失已有灵感
 - **隐私友好**：灵感数据为本地运行时产物，已默认被 `.gitignore` 排除
 
 ## 📁 目录结构
@@ -23,7 +25,7 @@ xin-ideas/
 │   ├── SKILL.md                # skill 定义与完整工作流（评分标准、产物约定、质量红线）
 │   └── assets/
 │       └── templates/          # 渲染模板（改动时只动数据对象）
-│           ├── detail.html     # 灵感详情页模板
+│           ├── detail.html     # 灵感明细页模板
 │           └── index.html      # 灵感索引页模板（卡片墙）
 ├── xin-ideas.zip               # 发布包：下载后可直接导入 agent 工具使用
 ├── docs/
@@ -69,7 +71,7 @@ npx skills add oscar-wang-xin/xin-ideas
 | 灵感索引页 | `.xin-ideas/index.html` | 卡片墙，支持搜索/排序/跳转 |
 | 灵感明细页 | `.xin-ideas/ideas/idea_<时间戳>.html` | 八维评分 + 完整拆解 |
 
-> 所有产物集中在 `.xin-ideas/` 一个目录内，复制整个目录即可完成备份或迁移。
+> 所有产物集中在 `.xin-ideas/` 一个目录内，复制整个目录即可完成备份或迁移。**重复使用同一目录时按增量方式更新**：已有灵感只增不删；若 `index.html` 结构不一致，会先备份为 `index.html.bak`、提取原有全部灵感后重建，绝不丢失历史内容。
 
 每个灵感包含：原话引用、一句话结论、八维分数与评价、收益 vs 代价、问题与应对、落地路线图、要避的坑、量化判据、成本量级。
 
@@ -112,6 +114,8 @@ This repository contains only the skill itself and its templates — **no idea d
 - **Raw idea capture**：every idea keeps your original words; a quote block on the detail page and a hover/tap "原话" tag on cards
 - **Light / dark theme**：one-tap toggle at the bottom-right, defaults to light and remembers your choice
 - **Mobile-first**：single-column layout, large touch targets, safe-area aware, tuned for phone browsing
+- **Handy interactions**：cards open details in a new tab, a one-tap close button on the detail page, and a draggable "back to top" button (drag it aside so it never covers content)
+- **Incremental by design**：reusing the same `.xin-ideas/` folder only appends; nothing existing is ever overwritten or lost
 - **Privacy-friendly**：idea data is generated locally at runtime and excluded by default via `.gitignore`
 
 ## 📁 Directory Structure
@@ -167,7 +171,7 @@ Once invoked, the skill produces everything inside the chosen `.xin-ideas/` fold
 | Idea index page | `.xin-ideas/index.html` | Card wall with search / sort / navigation |
 | Idea detail page | `.xin-ideas/ideas/idea_<timestamp>.html` | 8-dimension scores + full breakdown |
 
-> All artifacts live in the single `.xin-ideas/` folder; copy the whole folder to back up or migrate.
+> All artifacts live in the single `.xin-ideas/` folder; copy the whole folder to back up or migrate. **Updates to an existing folder are incremental**: existing ideas are only appended to, and if `index.html` has a mismatched structure it is first backed up to `index.html.bak` and the original links are carried over when rebuilding, so nothing is ever lost.
 
 Every idea includes: the original raw words, a one-line takeaway, 8-dimension scores and reviews, benefits vs. costs, risks & mitigations, a phased roadmap, pitfalls to avoid, quantified success/failure criteria, and cost magnitude.
 

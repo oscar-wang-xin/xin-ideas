@@ -62,6 +62,7 @@ try{
 
   /* Hero */
   .hero{margin-bottom:22px}
+  @media(max-width:820px){.hero{padding-right:56px}} /* 避开右上角关闭按钮 */
   .tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
   .tag{font-size:12.5px;font-weight:600;color:var(--primary);
     background:linear-gradient(135deg,rgba(108,99,255,.12),rgba(62,207,207,.12));
@@ -307,7 +308,7 @@ const IDEA = {
 const DIMS = Object.keys(IDEA.scores);
 document.title = IDEA.title && String(IDEA.title).trim() ? `${IDEA.title} · 灵感详情` : "灵感详情";
 const MAX = 10;
-const mean = DIMS.reduce((s,k)=>s+IDEA.scores[k],0)/DIMS.length;
+const mean = DIMS.reduce((s,k)=>s+(Number(IDEA.scores[k])||0),0)/DIMS.length;
 const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* 主题切换 */
@@ -333,8 +334,11 @@ const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 /* 返回顶部（可拖动） */
 (function(){
   const toTop=document.getElementById('toTop');
-  const SHOW_AFTER=400, DRAG_TOL=5, EDGE=8;
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* BOTTOM_SAFE 为右下角主题按钮禁区：46px 按钮 + 间隔 + 边缘，拖动不被它的高度所掩 */
+  const SHOW_AFTER=400, DRAG_TOL=5, EDGE=8, BOTTOM_SAFE=78;
+  const mq=matchMedia('(prefers-reduced-motion: reduce)');
+  let reduce=mq.matches;
+  mq.addEventListener('change',()=>{ reduce=mq.matches; });
   let drag=null, moved=false;
 
   function show(){ toTop.hidden = window.scrollY < SHOW_AFTER; }
@@ -342,10 +346,18 @@ const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
   show();
 
   function clamp(v,min,max){ return Math.min(Math.max(v,min),max); }
+  function reClamp(){
+    if(toTop.style.left==='') return; // 未拖过：保持 CSS right/bottom 定位
+    const w=toTop.offsetWidth, h=toTop.offsetHeight;
+    toTop.style.left=clamp(parseFloat(toTop.style.left)||0,0,innerWidth-w-EDGE)+'px';
+    toTop.style.top =clamp(parseFloat(toTop.style.top)||0,0,innerHeight-h-BOTTOM_SAFE)+'px';
+  }
+  window.addEventListener('resize',reClamp,{passive:true});
 
   toTop.addEventListener('pointerdown',e=>{
     drag={ sx:e.clientX, sy:e.clientY,
-           ox:toTop.offsetLeft, oy:toTop.offsetTop };
+           ox:parseFloat(toTop.style.left)||toTop.offsetLeft,
+           oy:parseFloat(toTop.style.top)||toTop.offsetTop };
     moved=false;
     try{ toTop.setPointerCapture(e.pointerId); }catch(err){}
   });
@@ -357,7 +369,7 @@ const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
       const w=toTop.offsetWidth, h=toTop.offsetHeight;
       toTop.classList.add('dragging');
       toTop.style.left=clamp(drag.ox+dx,0,innerWidth-w-EDGE)+'px';
-      toTop.style.top =clamp(drag.oy+dy,0,innerHeight-h-EDGE)+'px';
+      toTop.style.top =clamp(drag.oy+dy,0,innerHeight-h-BOTTOM_SAFE)+'px';
       toTop.style.right='auto'; toTop.style.bottom='auto';
     }
   });
@@ -367,9 +379,12 @@ const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
     if(!moved){
       window.scrollTo({top:0, behavior: reduce?'auto':'smooth'});
     }else{
-      // 松手后贴边吸附
-      const x=parseFloat(toTop.style.left)||0, w=toTop.offsetWidth;
+      // 松手后贴边吸附（纵向保持在主题按钮禁区外）
+      const w=toTop.offsetWidth, h=toTop.offsetHeight;
+      const x=parseFloat(toTop.style.left)||0;
+      const y=parseFloat(toTop.style.top)||0;
       toTop.style.left=(x<innerWidth/2?EDGE:innerWidth-w-EDGE)+'px';
+      toTop.style.top =clamp(y,0,innerHeight-h-BOTTOM_SAFE)+'px';
     }
     drag=null;
   });
@@ -398,12 +413,12 @@ function radarSVG(){
     g+=`<text x="${lx.toFixed(1)}" y="${(ly+4).toFixed(1)}" text-anchor="${anchor}">${esc(d)}</text>`;
   });
   let dp=[];
-  DIMS.forEach((d,i)=>{const a=-Math.PI/2+i*step, rr=R*IDEA.scores[d]/MAX;
+  DIMS.forEach((d,i)=>{const a=-Math.PI/2+i*step, rr=R*(Number(IDEA.scores[d])||0)/MAX;
     dp.push((cx+rr*Math.cos(a)).toFixed(1)+','+(cy+rr*Math.sin(a)).toFixed(1));});
   g+=`<polygon class="data" points="${dp.join(' ')}"/>`;
   return `<svg class="radar" width="360" height="360" viewBox="0 0 360 360">${g}</svg>`;
 }
-const barsHTML = () => DIMS.map(d=>{const v=IDEA.scores[d];
+const barsHTML = () => DIMS.map(d=>{const v=Number(IDEA.scores[d])||0;
   return `<div class="bar-row"><span class="name">${esc(d)}</span>
     <span class="bar-track"><i style="width:0%;background:${barColor(v)}" data-w="${(v/MAX*100).toFixed(0)}%"></i></span>
     <span class="val">${v}</span></div>`;}).join('');
