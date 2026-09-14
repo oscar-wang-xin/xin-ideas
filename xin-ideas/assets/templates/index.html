@@ -46,11 +46,12 @@ try{
   .theme-toggle{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));
     z-index:50;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
     background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);color:var(--ink-2);
-    transition:transform .18s ease,color .18s ease,box-shadow .18s ease;-webkit-tap-highlight-color:transparent}
+    transition:transform .18s ease,color .18s ease,box-shadow .18s ease;touch-action:none;-webkit-tap-highlight-color:transparent}
   .theme-toggle:hover{transform:translateY(-2px);color:var(--primary);box-shadow:var(--shadow-hover)}
   .theme-toggle:active{transform:scale(.94)}
   .theme-toggle:focus-visible{outline:3px solid var(--primary);outline-offset:3px}
   .theme-toggle svg{width:20px;height:20px}
+  .theme-toggle.dragging{transition:none;opacity:.8}
   .theme-toggle .i-moon{display:none}
   html[data-theme="dark"] .theme-toggle .i-sun{display:none}
   html[data-theme="dark"] .theme-toggle .i-moon{display:block}
@@ -198,15 +199,65 @@ const empty=document.getElementById('empty');
 const q=document.getElementById('q');
 const sort=document.getElementById('sort');
 
-/* 主题切换 */
+/* 可拖动浮层按钮：拖拽贴边吸附、边界限制、resize 重钳位；非拖动松手派发 tap */
+function makeDraggable(el,{bottomSafe=0}={}){
+  const EDGE=8, DRAG_TOL=5;
+  let drag=null, moved=false;
+  function clamp(v,min,max){ return Math.min(Math.max(v,min),max); }
+  function reClamp(){
+    if(el.style.left==='') return; // 未拖过：保持 CSS right/bottom 定位
+    const w=el.offsetWidth, h=el.offsetHeight;
+    el.style.left=clamp(parseFloat(el.style.left)||0,0,innerWidth-w-EDGE)+'px';
+    el.style.top =clamp(parseFloat(el.style.top)||0,0,innerHeight-h-bottomSafe-EDGE)+'px';
+  }
+  window.addEventListener('resize',reClamp,{passive:true});
+  el.addEventListener('pointerdown',e=>{
+    drag={ sx:e.clientX, sy:e.clientY,
+           ox:parseFloat(el.style.left)||el.offsetLeft,
+           oy:parseFloat(el.style.top)||el.offsetTop };
+    moved=false;
+    try{ el.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  el.addEventListener('pointermove',e=>{
+    if(!drag) return;
+    const dx=e.clientX-drag.sx, dy=e.clientY-drag.sy;
+    if(Math.abs(dx)+Math.abs(dy)>DRAG_TOL) moved=true;
+    if(moved){
+      const w=el.offsetWidth, h=el.offsetHeight;
+      el.classList.add('dragging');
+      el.style.left=clamp(drag.ox+dx,0,innerWidth-w-EDGE)+'px';
+      el.style.top =clamp(drag.oy+dy,0,innerHeight-h-bottomSafe-EDGE)+'px';
+      el.style.right='auto'; el.style.bottom='auto';
+    }
+  });
+  function finish(){
+    if(!drag) return;
+    el.classList.remove('dragging');
+    if(!moved){
+      el.dispatchEvent(new CustomEvent('tap'));
+    }else{
+      const w=el.offsetWidth, h=el.offsetHeight;
+      const x=parseFloat(el.style.left)||0;
+      const y=parseFloat(el.style.top)||0;
+      el.style.left=(x<innerWidth/2?EDGE:innerWidth-w-EDGE)+'px';
+      el.style.top =clamp(y,0,innerHeight-h-bottomSafe-EDGE)+'px';
+    }
+    drag=null;
+  }
+  el.addEventListener('pointerup',finish);
+  el.addEventListener('pointercancel',()=>{ drag=null; moved=false; el.classList.remove('dragging'); });
+}
+
+/* 主题切换（按钮可拖动，拖完不误触） */
 (function(){
   const btn=document.getElementById('themeBtn');
   function apply(t){document.documentElement.setAttribute('data-theme',t);
     btn.setAttribute('aria-label',t==='dark'?'切换到浅色主题':'切换到深色主题');
     try{localStorage.setItem('xin-ideas-theme',t)}catch(e){}}
-  btn.addEventListener('click',()=>{
+  btn.addEventListener('tap',()=>{
     apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
   });
+  makeDraggable(btn);
 })();
 
 function cardColor(v){
