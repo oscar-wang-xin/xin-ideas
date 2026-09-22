@@ -1,0 +1,5 @@
+{
+  "_note": "灵感墙根目录配置。.xin-ideas/ 目录建在 baseDir 下（结构：baseDir/.xin-ideas/index.html + baseDir/.xin-ideas/ideas/idea_<时间戳>.html）。首次使用若 baseDir 为空，skill 会弹窗询问，默认选项为 skill 安装目录。改这里即可整体迁移灵感墙位置。注意：已有灵感墙只做增量写入、绝不覆盖；索引结构不一致时先备份为 index.html.bak 再重建（详见 SKILL.md「防覆盖与容错」）。theme 为默认色调：robot=冷白机甲 / aurora=蓝紫极光；用户点选后会写 localStorage 覆盖，这里只管首次打开的默认。",
+  "baseDir": "",
+  "theme": "aurora"
+}

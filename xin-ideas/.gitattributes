@@ -1,0 +1,14 @@
+# skill 包换行统一：随分发包带走，保证在任何平台 checkout / 解压后一致
+* text=auto eol=lf
+
+*.md    text eol=lf
+*.html  text eol=lf
+*.json  text eol=lf
+*.py    text eol=lf
+
+*.png   binary
+*.jpg   binary
+*.ico   binary
+*.zip   binary
+*.woff2 binary
+*.ttf   binary

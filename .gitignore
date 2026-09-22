@@ -3,6 +3,9 @@
 .xin-ideas/
 # skill 目录内的状态文件（记录 .xin-ideas/ 路径，含本地绝对路径），勿入库
 .xin-ideas-path
+# 运行时临时文件：写入用的临时 JSON、体检基线快照
+_tmp_idea.json
+_baseline.json
 
 # ===== 打包产物（xin-ideas.zip 为发布包，需随仓库维护并入库） =====
 *.zip
@@ -29,5 +32,5 @@ desktop.ini
 # ===== 运行附件（截图/剪贴板等临时素材，勿入库） =====
 .reasonix/
 
-# ===== 本地打包脚本（仅本地使用，勿发布） =====
-scripts/
+# ===== 本地打包脚本（仅本地使用，勿发布；仅限仓库根，不影响 xin-ideas/scripts/ 功能脚本） =====
+/scripts/

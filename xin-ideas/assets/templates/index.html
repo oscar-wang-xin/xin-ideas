@@ -4,147 +4,265 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>灵感库 · Idea Board</title>
-<script>
-/* 主题初始化：默认浅色；读取本地偏好，避免闪烁 */
-try{
-  if(localStorage.getItem('xin-ideas-theme')==='dark'){
-    document.documentElement.setAttribute('data-theme','dark');
-  }
-}catch(e){}
-</script>
 <style>
   :root{
-    --primary:#6C63FF; --primary-2:#8B7BFF; --secondary:#3ECFCF; --accent:#FF6584;
-    --bg:#F6F7FC; --surface:#FFFFFF; --surface-2:#EFF1FA; --surface-3:#E6E8F6;
-    --ink:#17182B; --ink-2:#5B5C7E; --line:#E7E8F4;
-    --shadow:0 6px 28px rgba(99,91,255,.10), 0 1px 3px rgba(23,24,43,.05);
-    --shadow-hover:0 16px 48px rgba(99,91,255,.18), 0 2px 6px rgba(23,24,43,.06);
-    --r:20px; --r-sm:13px;
+    --primary:#6C63FF;
+    --primary-2:#8B7BFF;
+    --secondary:#3ECFCF;
+    --accent:#FF6584;
+    --bg:#F7F8FD;
+    --surface:#FFFFFF;
+    --surface-2:#F4F5FC;
+    --ink:#1A1A2E;
+    --ink-2:#5A5A7A;
+    --line:#E8E9F5;
+    --shadow:0 6px 28px rgba(var(--primary-rgb),.10), 0 1px 3px rgba(var(--ink-rgb),.05);
+    --shadow-hover:0 16px 48px rgba(var(--primary-rgb),.18), 0 2px 6px rgba(var(--ink-rgb),.06);
+    --r:20px;
+    --r-sm:13px;
     --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
   }
-  html[data-theme="dark"]{
-    --primary:#8E7DFF; --primary-2:#A79BFF; --secondary:#43D0D0; --accent:#FF7290;
-    --bg:#0F101C; --surface:#191B2A; --surface-2:#232540; --surface-3:#2C2F4C;
-    --ink:#EEF0FA; --ink-2:#9DA2C6; --line:#2B2D47;
-    --shadow:0 8px 30px rgba(0,0,0,.38), 0 1px 3px rgba(0,0,0,.3);
-    --shadow-hover:0 16px 46px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.32);
+  /* ===== 主题变量 =====================================================
+     AURORA（蓝紫极光）为默认；切到 ROBOT（冷白机甲）时由
+     html[data-theme="robot"] 覆盖。所有色值都走变量，故 JS 里也不要
+     硬写颜色（卡片评分用 var(--bar-*)）。
+     ================================================================== */
+  :root{
+    --primary-rgb:108,99,255;
+    --secondary-rgb:62,207,207;
+    --bad-rgb:255,101,132;
+    --ink-rgb:20,20,50;
+    --muted-a:#B6BBD2; --muted-b:#9AA0BE;
+    --bad-ink:#B23A52;
+    /* 卡片评分条色阶（>=8 / >=6 / >=4 / 其余） */
+    --bar1a:#3ECFCF; --bar1b:#6C63FF;
+    --bar2a:#8B7BFF; --bar2b:#6C63FF;
+    --bar3a:#FFB36B; --bar3b:#FFA94D;
+    --bar4a:#FF8DA3; --bar4b:#FF6584;
   }
+  /* —— ROBOT · 冷白机甲：近黑 + 冷蓝灰 + 白，方角、细线、单色钢灰阶 —— */
+  html[data-theme="robot"]{
+    --primary:#232A38; --primary-2:#3E4759; --secondary:#7A8598;
+    --accent:#8A94A8;
+    --bg:#F2F4F7; --surface:#FFFFFF; --surface-2:#E9ECF1;
+    --ink:#14171E; --ink-2:#5C6473; --line:#DCE0E7;
+    --primary-rgb:35,42,56;
+    --secondary-rgb:122,133,152;
+    --bad-rgb:180,85,95;
+    --ink-rgb:20,23,30;
+    --muted-a:#AEB6C2; --muted-b:#8C95A4;
+    --bad-ink:#9A3F49;
+    --shadow:0 1px 2px rgba(20,23,30,.05), 0 10px 26px rgba(20,23,30,.055);
+    --shadow-hover:0 2px 4px rgba(20,23,30,.06), 0 18px 40px rgba(20,23,30,.10);
+    --r:12px; --r-sm:9px;
+    --bar1a:#3C4657; --bar1b:#151A23;
+    --bar2a:#8A94A6; --bar2b:#5C6473;
+    --bar3a:#C79A55; --bar3b:#A2762F;
+    --bar4a:#C4707A; --bar4b:#A44B55;
+  }
+  /* 冷白机甲的背景：去掉彩色光晕，换成冷灰网格 + 极淡钢色晕 */
+  html[data-theme="robot"] .bg-deco{background:
+      radial-gradient(560px 380px at 14% -10%, rgba(var(--primary-rgb),.07), transparent 62%),
+      radial-gradient(520px 360px at 100% 2%, rgba(var(--secondary-rgb),.13), transparent 58%),
+      linear-gradient(180deg,rgba(255,255,255,.7),transparent 42%);}
+  html[data-theme="robot"] .bg-grid{opacity:.6;
+    background-image:linear-gradient(rgba(var(--primary-rgb),.07) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(var(--primary-rgb),.07) 1px,transparent 1px);
+    background-size:28px 28px;}
+  /* 机甲感细节：方角卡片、小写字距的上位标识 */
+  html[data-theme="robot"] .c-origin,html[data-theme="robot"] .c-tag{border-radius:6px}
+  html[data-theme="robot"] .c-score{border-radius:8px}
+  html[data-theme="robot"] .stat{box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.7)}
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
-  body{font-family:var(--font);color:var(--ink);background:var(--bg);min-height:100vh;position:relative;overflow-x:hidden}
+  body{font-family:var(--font);color:var(--ink);background:var(--bg);min-height:100vh;position:relative;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
   .bg-deco{position:fixed;inset:0;z-index:0;pointer-events:none;
     background:
-      radial-gradient(680px 460px at 8% -10%, rgba(108,99,255,.14), transparent 60%),
-      radial-gradient(600px 420px at 102% 4%, rgba(62,207,207,.12), transparent 55%),
-      radial-gradient(720px 520px at 85% 115%, rgba(255,101,132,.06), transparent 60%);}
-  html[data-theme="dark"] .bg-deco{opacity:.55}
-  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;
-    padding:30px 16px calc(96px + env(safe-area-inset-bottom))}
-  @media(min-width:720px){.wrap{padding:46px 22px calc(96px + env(safe-area-inset-bottom))}}
+      radial-gradient(680px 460px at 8% -10%, rgba(var(--primary-rgb),.16), transparent 60%),
+      radial-gradient(600px 420px at 102% 4%, rgba(var(--secondary-rgb),.14), transparent 55%),
+      radial-gradient(720px 520px at 85% 115%, rgba(var(--bad-rgb),.07), transparent 60%);}
+  .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(var(--primary-rgb),.04) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--primary-rgb),.04) 1px,transparent 1px);
+    background-size:36px 36px;
+    -webkit-mask-image:radial-gradient(120% 70% at 50% 0%,#000,transparent 80%);
+    mask-image:radial-gradient(120% 70% at 50% 0%,#000,transparent 80%);}
+  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:46px 22px 80px}
 
-  /* 主题切换按钮（固定右下，44px 触控，避开安全区） */
-  .theme-toggle{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));
-    z-index:50;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
-    background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);color:var(--ink-2);
-    transition:transform .18s ease,color .18s ease,box-shadow .18s ease;touch-action:none;-webkit-tap-highlight-color:transparent}
-  .theme-toggle:hover{transform:translateY(-2px);color:var(--primary);box-shadow:var(--shadow-hover)}
-  .theme-toggle:active{transform:scale(.94)}
-  .theme-toggle:focus-visible{outline:3px solid var(--primary);outline-offset:3px}
-  .theme-toggle svg{width:20px;height:20px}
-  .theme-toggle.dragging{transition:none;opacity:.8}
-  .theme-toggle .i-moon{display:none}
-  html[data-theme="dark"] .theme-toggle .i-sun{display:none}
-  html[data-theme="dark"] .theme-toggle .i-moon{display:block}
-
-  .hero{text-align:center;margin-bottom:26px}
-  .hero .kicker{font-size:12.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--primary)}
-  .hero h1{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.02em;margin-top:8px}
+  .hero{text-align:center;margin-bottom:30px}
+  .hero .kicker{font-size:13px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+    background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero h1{font-size:clamp(32px,5vw,48px);font-weight:800;letter-spacing:-.02em;margin-top:8px}
   .hero p{color:var(--ink-2);margin-top:10px;font-size:15px}
-  .stats{display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+  .stats{display:flex;gap:14px;justify-content:center;margin-top:18px;flex-wrap:wrap}
   .stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);
-    padding:10px 18px;box-shadow:var(--shadow);text-align:center;min-width:104px}
-  .stat b{display:block;font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--secondary));
-    -webkit-background-clip:text;background-clip:text;color:transparent}
+    padding:12px 20px;box-shadow:var(--shadow);text-align:center;min-width:118px;position:relative;overflow:hidden;
+    box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.6)}
+  .stat::after{content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--primary),var(--secondary))}
+  .stat b{display:block;font-size:25px;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--secondary));
+    -webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.15}
   .stat span{font-size:12px;color:var(--ink-2)}
 
-  .controls{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0 22px;align-items:center}
+  .controls{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0 24px;align-items:center}
   .search{flex:1;min-width:220px;display:flex;align-items:center;gap:10px;background:var(--surface);
     border:1.5px solid var(--line);border-radius:999px;padding:0 18px;height:50px;box-shadow:var(--shadow);
-    transition:border-color .2s ease}
-  .search:focus-within{border-color:var(--primary)}
+    transition:border-color .2s ease,box-shadow .2s ease}
+  .search:focus-within{border-color:var(--primary);box-shadow:0 0 0 4px rgba(var(--primary-rgb),.12),var(--shadow)}
   .search svg{flex:none;opacity:.5}
   .search input{flex:1;border:none;outline:none;background:transparent;font-size:16px;color:var(--ink);font-family:var(--font)}
-  .search input::placeholder{color:var(--ink-2);opacity:.75}
   .sort{display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--line);
-    border-radius:999px;height:50px;padding:0 16px;box-shadow:var(--shadow)}
+    border-radius:999px;height:50px;padding:0 16px;box-shadow:var(--shadow);transition:border-color .2s ease,box-shadow .2s ease}
+  .sort:focus-within{border-color:var(--primary);box-shadow:0 0 0 4px rgba(var(--primary-rgb),.12),var(--shadow)}
   .sort label{font-size:13px;color:var(--ink-2);font-weight:600}
-  .sort select{border:none;outline:none;background:transparent;font-size:16px;font-weight:700;color:var(--ink);font-family:var(--font);cursor:pointer}
+  .sort select{border:none;outline:none;background:transparent;font-size:15px;font-weight:700;color:var(--ink);font-family:var(--font);cursor:pointer}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;
-    box-shadow:var(--shadow);text-decoration:none;color:inherit;display:flex;flex-direction:column;
-    position:relative;transition:transform .22s cubic-bezier(.2,0,0,1),box-shadow .22s ease;cursor:pointer;
-    opacity:0;transform:translateY(14px);animation:rise .55s cubic-bezier(.2,0,0,1) forwards;
-    -webkit-tap-highlight-color:transparent}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px}
+  .card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:17px 18px 15px;
+    box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.6);display:flex;flex-direction:column;overflow:hidden;
+    transition:transform .22s cubic-bezier(.2,0,0,1),box-shadow .22s ease;cursor:default;
+    opacity:0;transform:translateY(14px);animation:rise .55s cubic-bezier(.2,0,0,1) forwards}
   @keyframes rise{to{opacity:1;transform:none}}
-  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
-  .card:active{transform:scale(.99)}
-  .card:focus-visible{outline:3px solid var(--primary);outline-offset:3px}
-  .c-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-  .c-title{font-size:18px;font-weight:800;letter-spacing:-.01em;line-height:1.3}
-  .c-score{flex:none;font-size:13px;font-weight:800;color:#fff;padding:5px 11px;border-radius:999px;
-    background:linear-gradient(135deg,var(--primary),var(--primary-2));white-space:nowrap}
-  .c-sum{margin-top:10px;color:var(--ink-2);font-size:14px;line-height:1.6;
+  /* 精致感：所有卡片顶部一道极淡的渐隐光，has-origin 仍保留渐变描边 */
+  .card::after{content:"";position:absolute;top:0;left:16px;right:16px;height:1px;pointer-events:none;
+    background:linear-gradient(90deg,transparent,rgba(var(--primary-rgb),.22),transparent)}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover)}
+  /* 只有卡片正文 a.c-link 可点击跳转（新标签页打开）；标题栏 .c-top 与「原话」角标在 <a> 之外，点它们天然不会跳转 */
+  .c-link{display:flex;flex-direction:column;flex:1;text-decoration:none;color:inherit;cursor:pointer;
+    border-radius:calc(var(--r) - 8px)}
+  .c-link:focus-visible{outline:3px solid var(--primary);outline-offset:4px}
+  .card.has-origin{border-color:rgba(var(--primary-rgb),.32)}
+  .card.has-origin::before{content:"";position:absolute;inset:0;border-radius:var(--r);padding:1.5px;pointer-events:none;
+    background:linear-gradient(135deg,rgba(var(--primary-rgb),.55),rgba(var(--secondary-rgb),.4));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+  .c-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .c-title{font-size:16px;font-weight:800;letter-spacing:-.01em;line-height:1.35}
+  .c-right{display:flex;align-items:center;gap:7px;flex:none}
+  .c-score{font-size:12px;font-weight:800;color:#fff;padding:4px 10px;border-radius:999px;letter-spacing:.02em;
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));white-space:nowrap;box-shadow:0 2px 7px rgba(var(--primary-rgb),.28)}
+  .c-score-none{font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:4px 9px}
+  .c-origin{font-size:10.5px;font-weight:700;color:var(--primary);background:rgba(var(--primary-rgb),.12);
+    border:1px solid rgba(var(--primary-rgb),.22);padding:2.5px 8px;border-radius:999px;white-space:nowrap}
+  .c-sum{margin-top:9px;color:var(--ink-2);font-size:12.5px;line-height:1.62;
     display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-  .c-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-  .c-tag{font-size:11.5px;font-weight:600;color:var(--primary);background:rgba(108,99,255,.10);
-    border:1px solid rgba(108,99,255,.18);padding:3px 9px;border-radius:999px}
-
-  /* 原话标签 + Tip */
-  .c-raw{position:relative;margin-top:10px;align-self:flex-start}
-  .raw-tag{display:inline-flex;align-items:center;gap:5px;min-height:44px;font-size:12px;font-weight:700;color:var(--primary);
-    background:rgba(108,99,255,.10);border:1px solid rgba(108,99,255,.22);padding:6px 14px;border-radius:999px;
-    cursor:pointer;user-select:none;transition:background .18s ease,color .18s ease}
-  .raw-tag:hover{background:rgba(108,99,255,.18)}
-  .raw-tag:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
-  .raw-tag svg{width:13px;height:13px}
-  .raw-tip{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:30;
-    background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-hover);
-    padding:12px 14px;font-size:13.5px;color:var(--ink-2);line-height:1.65;white-space:pre-wrap;
-    max-height:180px;overflow:auto;
-    opacity:0;visibility:hidden;transform:translateY(-4px);
-    transition:opacity .18s ease,transform .18s ease,visibility .18s}
-  .raw-tip b{display:block;font-size:11.5px;font-weight:700;color:var(--primary);letter-spacing:.05em;margin-bottom:6px}
-  .card:hover .raw-tip,
-  .card:focus-within .raw-tip,
-  .card.raw-open .raw-tip{opacity:1;visibility:visible;transform:none}
-
-  .c-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
-    align-items:center;color:var(--ink-2);font-size:12.5px}
-  .c-foot .m-item{display:inline-flex;align-items:center;gap:6px}
-  .c-foot .m-item svg{width:14px;height:14px;opacity:.8}
-  .c-foot .go{font-weight:700;color:var(--primary);display:inline-flex;align-items:center;gap:5px}
-  .c-foot .go svg{width:14px;height:14px}
+  .c-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+  .c-tag{font-size:11px;font-weight:600;color:var(--primary);background:rgba(var(--primary-rgb),.10);
+    border:1px solid rgba(var(--primary-rgb),.16);padding:2.5px 8px;border-radius:999px}
+  .c-foot{margin-top:12px;padding-top:11px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
+    align-items:center;color:var(--ink-2);font-size:11.5px}
+  .c-foot .go{font-weight:700;color:var(--primary)}
+  .c-foot .c-ts{display:inline-flex;align-items:center;gap:5px}
   .empty{text-align:center;color:var(--ink-2);padding:60px 20px;font-size:15px;display:none}
-  .foot{margin-top:36px;text-align:center;color:var(--ink-2);font-size:12.5px;opacity:.7}
+  .empty::before{content:"";display:block;width:54px;height:54px;margin:0 auto 16px;border-radius:16px;
+    background:linear-gradient(135deg,rgba(var(--primary-rgb),.14),rgba(var(--secondary-rgb),.12));border:1px solid var(--line)}
+  .foot{margin-top:40px;text-align:center;color:var(--ink-2);font-size:12.5px;opacity:.7}
 
-  @media (prefers-reduced-motion: reduce){
-    *,*::before,*::after{animation:none!important;transition:none!important}
-    .card{opacity:1;transform:none}
+  /* 原话浮动提示 */
+  .tip{position:fixed;z-index:999;max-width:340px;background:var(--ink);color:#fff;font-size:13px;line-height:1.65;
+    padding:13px 16px;border-radius:12px;box-shadow:0 16px 40px rgba(var(--ink-rgb),.34);
+    opacity:0;transform:translateY(8px) scale(.98);transition:opacity .16s ease,transform .16s ease;
+    pointer-events:none;border:1px solid rgba(255,255,255,.10)}
+  .tip.show{opacity:1;transform:none}
+  .tip .t-label{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--secondary);text-transform:uppercase;margin-bottom:6px}
+  .tip::after{content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%) rotate(45deg);
+    width:12px;height:12px;background:var(--ink);border-right:1px solid rgba(255,255,255,.10);border-bottom:1px solid rgba(255,255,255,.10)}
+  .tip.below::after{top:-6px;bottom:auto;border:none;border-left:1px solid rgba(255,255,255,.10);border-top:1px solid rgba(255,255,255,.10)}
+  .tip .t-tap{display:none}
+
+  /* ===== 移动端 / 触屏适配 ===== */
+  @media (max-width:480px){
+    .wrap{padding:30px 16px 64px}
+    .grid{grid-template-columns:1fr}
+    .card{padding:18px 18px 16px}
+    .controls{margin:22px 0 20px}
+    .search,.sort{height:46px}
+    .search input{font-size:16px}
+    .hero h1{font-size:30px}
+    .hero p{font-size:14px}
+    .stats{gap:8px}
+    .stat{min-width:0;flex:1;padding:11px 8px}
+    .stat b{font-size:22px}
+    .stat span{font-size:11px}
+    .c-title{font-size:17px}
+    .c-sum{font-size:13.5px}
+    .foot{font-size:11.5px}
+  }
+  /* 触屏设备：原话角标可点触发，tip 改为底部居中的轻提示、可点关闭 */
+  @media (hover:none){
+    .c-origin{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+    .c-origin:active{transform:scale(.93)}
+    .tip{max-width:min(88vw,360px);font-size:14px;line-height:1.7;padding:14px 16px;pointer-events:auto;
+      left:50%!important;transform:translateX(-50%)!important;top:auto!important;bottom:18px}
+    .tip::after,.tip.below::after{display:none}
+    .tip .t-tap{display:block;margin-top:9px;font-size:11px;color:var(--secondary);opacity:.85}
+  }
+  /* ===== 色调选择器 ====================================================
+     浮在右上角；点开列出所有主题（三色块 + 中文名 + 英文名 + 勾选）。
+     选择结果存 localStorage，明细页与列表页共用同一键，切页保持一致。
+     ================================================================== */
+  .theme-pick{position:fixed;right:16px;top:16px;z-index:96;font-family:var(--font)}
+  .theme-btn{display:inline-flex;align-items:center;gap:9px;height:38px;padding:0 13px;border-radius:999px;
+    background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);cursor:pointer;
+    font-family:inherit;font-size:12.5px;font-weight:700;color:var(--ink);
+    transition:box-shadow .2s ease,transform .2s ease}
+  .theme-btn:hover{box-shadow:var(--shadow-hover);transform:translateY(-1px)}
+  .theme-btn:focus-visible{outline:3px solid var(--primary);outline-offset:3px}
+  .theme-btn .sw{display:inline-flex;gap:2px;flex:none}
+  .theme-btn .sw i{width:11px;height:11px;border-radius:3px;display:block;border:1px solid rgba(0,0,0,.14)}
+  .theme-btn .tn{white-space:nowrap}
+  .theme-btn .chev{opacity:.55;flex:none;transition:transform .2s ease}
+  .theme-pick.open .theme-btn .chev{transform:rotate(180deg)}
+  .theme-menu{position:absolute;right:0;top:calc(100% + 8px);min-width:214px;padding:6px;
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-hover);
+    opacity:0;visibility:hidden;transform:translateY(-6px) scale(.98);transform-origin:top right;
+    transition:opacity .16s ease,transform .16s ease,visibility .16s}
+  .theme-pick.open .theme-menu{opacity:1;visibility:visible;transform:none}
+  .theme-opt{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:none;
+    background:transparent;border-radius:9px;cursor:pointer;font-family:inherit;text-align:left;color:var(--ink);
+    transition:background .15s ease}
+  .theme-opt:hover{background:var(--surface-2)}
+  .theme-opt:focus-visible{outline:2px solid var(--primary);outline-offset:-2px}
+  .theme-opt .sw{display:flex;gap:3px;flex:none}
+  .theme-opt .sw i{width:14px;height:14px;border-radius:4px;display:block;border:1px solid rgba(0,0,0,.14)}
+  .theme-opt .meta{flex:1;line-height:1.22}
+  .theme-opt .nm{display:block;font-size:13px;font-weight:800}
+  .theme-opt .en{display:block;font-size:9.5px;font-weight:700;letter-spacing:.16em;color:var(--ink-2);opacity:.8}
+  .theme-opt .ck{flex:none;font-weight:900;color:var(--primary);opacity:0;transition:opacity .15s ease}
+  .theme-opt.on .ck{opacity:1}
+  @media (max-width:560px){
+    .theme-pick{right:12px;top:12px}
+    .theme-btn{height:34px;padding:0 11px;font-size:12px}
+    .theme-btn .tn{display:none}
+    .theme-menu{min-width:190px}
   }
 </style>
+<script>
+/* 首屏应用主题：默认值由 upsert-idea.js 从 config.json 注入；用户点选过则用 localStorage。
+   必须放在 <head> 里、早于任何渲染，否则会看到主题闪一下。 */
+window.__XIN_DEFAULT_THEME__ = "aurora";
+(function () {
+  var t = window.__XIN_DEFAULT_THEME__;
+  try { t = localStorage.getItem('xin-ideas-theme') || t; } catch (e) { /* 忽略 */ }
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
 </head>
 <body>
 <div class="bg-deco"></div>
-<button class="theme-toggle" id="themeBtn" type="button" aria-label="切换深浅色主题">
-  <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8"/></svg>
-  <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-</button>
+<div class="bg-grid"></div>
+<!-- 色调选择：默认取 config 注入的 DEFAULT_THEME，点选后写 localStorage，跨页面生效 -->
+<div class="theme-pick" id="themePick">
+  <button class="theme-btn" id="themeBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="切换色调" title="切换色调">
+    <span class="sw" id="themeBtnSw" aria-hidden="true"></span>
+    <span class="tn" id="themeBtnName">色调</span>
+    <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="theme-menu" id="themeMenu" role="listbox" aria-label="色调列表"></div>
+</div>
 <main class="wrap">
   <header class="hero">
     <div class="kicker">Idea Board</div>
     <h1>灵感库</h1>
-    <p>抛想法进来，先体检、后动手。每个灵感都有八维评分与可行性分析。</p>
+    <p>抛想法进来，先体检、后动手。每个灵感都有十维评分与可行性分析。</p>
     <div class="stats">
       <div class="stat"><b id="stat-count">0</b><span>灵感总数</span></div>
       <div class="stat"><b id="stat-avg">0.0</b><span>平均评分</span></div>
@@ -155,7 +273,7 @@ try{
   <div class="controls">
     <label class="search">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input id="q" type="search" placeholder="搜索标题、标签、原话或摘要…" autocomplete="off">
+      <input id="q" type="search" placeholder="搜索标题、标签、摘要或原话…" autocomplete="off">
     </label>
     <div class="sort">
       <label for="sort">排序</label>
@@ -171,180 +289,225 @@ try{
   <div class="grid" id="grid"></div>
   <div class="empty" id="empty">没有匹配的灵感，换个关键词试试。</div>
 
-  <div class="foot">由 xin-ideas skill 维护 · 数据存于本文件 IDEAS 数组，新增灵感时追加一项即可</div>
+  <div class="foot">由 xin-ideas skill 维护 · 桌面悬停 / 手机点「原话」角标可查看构思原话 · 数据存于本文件 IDEAS 数组</div>
 </main>
 
 <script>
 /* ============================================================
-   灵感索引数据 —— 更新时保留原有条目，只增不删，绝不让历史灵感丢失。
-   新增灵感时，往这个数组里 push 一项即可。
-   file 为相对本文件的路径（ideas/ 子目录下）。score 为综合评分(1-10)。
-   raw 为用户原话（原始表达），可为空字符串；卡片上"原话"标签 hover/点击可查看。
+   灵感索引数据 —— 新增灵感时，往这个数组里 push 一项即可。
+   file 为相对本文件的路径（同目录下的 ideas/ 子目录，如 ideas/idea_20260913_170000.html）。
+   score 为综合评分(1-10)；写 null 或不写 = 本条「未评分」（轻量记录、未做十维体检），卡片显示「未评」且不参与分数排序与统计。
+   origin（可选）为构思原话：用户抛出灵感时说的原话；有则卡片显示「原话」角标，悬停/点击弹出。
    ============================================================ */
 const IDEAS = [
+  /* 初始为空 —— 新增灵感时往这里追加一项（下面是被注释掉的写法示例，别把示例留在正式文件里）：
   {
-    id: "example",
-    title: "示例灵感",
-    ts: "2026-01-01 00:00",
-    tags: ["示例","模板"],
-    score: 7.0,
-    raw: "这是一条示例原话。新增灵感后它会被真实的想法取代，点卡片上的「原话」标签或悬停卡片即可看到。",
-    summary: "这是一条示例卡片，新增灵感后它会被真实的想法取代。点击可跳转到详情页。",
-    file: "ideas/idea_example.html"
+    id: "20260913_170000",                  // 与详情页文件名的时间戳一致
+    title: "灵感标题",
+    ts: "2026-09-13 17:00",                 // 展示用的灵感时间
+    tags: ["工具","AI"],
+    score: 7.5,                             // 十维均值，保留一位小数；轻量记录可写 null（卡片显示「未评」）
+    summary: "一句话结论",
+    origin: "（可选）用户抛出这个灵感时说的原话",
+    file: "ideas/idea_20260913_170000.html"
   }
+  */
 ];
+
+/* 缺字段兜底：某条数据漏字段时，不让整面卡片墙崩掉、也不显示 "undefined" */
+function norm(it){
+  return Object.assign({}, it, {
+    title: it.title || "（未命名）",
+    ts: it.ts || "",
+    tags: Array.isArray(it.tags) ? it.tags : [],
+    summary: typeof it.summary === "string" ? it.summary : "",
+    origin: typeof it.origin === "string" ? it.origin : "",
+    /* score 为 number → 已体检评分；为 null / 缺失 → 「未评分」（轻量记录）。不强转 0，否则会被误读成「0 分烂想法」。 */
+    score: typeof it.score === "number" ? it.score : null,
+    file: it.file || "#"
+  });
+}
+const ALL = IDEAS.map(norm);
 
 const grid=document.getElementById('grid');
 const empty=document.getElementById('empty');
 const q=document.getElementById('q');
 const sort=document.getElementById('sort');
 
-/* 可拖动浮层按钮：拖拽贴边吸附、边界限制、resize 重钳位；非拖动松手派发 tap */
-function makeDraggable(el,{bottomSafe=0}={}){
-  const EDGE=8, DRAG_TOL=5;
-  let drag=null, moved=false, suppressClick=false;
-  function clamp(v,min,max){ return Math.min(Math.max(v,min),max); }
-  function pxPos(v){ const n=parseFloat(v); return isNaN(n)?null:n; }
-  function reClamp(){
-    const l=pxPos(el.style.left);
-    if(l===null) return; // 未拖过：保持 CSS right/bottom 定位
-    const w=el.offsetWidth, h=el.offsetHeight;
-    el.style.left=clamp(l,0,innerWidth-w-EDGE)+'px';
-    el.style.top =clamp(pxPos(el.style.top)||0,0,innerHeight-h-bottomSafe-EDGE)+'px';
-  }
-  window.addEventListener('resize',reClamp,{passive:true});
-  el.addEventListener('pointerdown',e=>{
-    drag={ sx:e.clientX, sy:e.clientY,
-           ox:pxPos(el.style.left)??el.offsetLeft,
-           oy:pxPos(el.style.top)??el.offsetTop };
-    moved=false;
-    try{ el.setPointerCapture(e.pointerId); }catch(err){}
-  });
-  el.addEventListener('pointermove',e=>{
-    if(!drag) return;
-    const dx=e.clientX-drag.sx, dy=e.clientY-drag.sy;
-    if(Math.abs(dx)+Math.abs(dy)>DRAG_TOL) moved=true;
-    if(moved){
-      const w=el.offsetWidth, h=el.offsetHeight;
-      el.classList.add('dragging');
-      el.style.left=clamp(drag.ox+dx,0,innerWidth-w-EDGE)+'px';
-      el.style.top =clamp(drag.oy+dy,0,innerHeight-h-bottomSafe-EDGE)+'px';
-      el.style.right='auto'; el.style.bottom='auto';
-    }
-  });
-  function finish(){
-    if(!drag) return;
-    drag=null; moved=false;
-    el.classList.remove('dragging');
-    suppressClick=true; // pointerup 伴随的 click 由本路径消化，防键盘/指针双触发
-    if(!moved){
-      el.dispatchEvent(new CustomEvent('tap'));
-    }else{
-      const w=el.offsetWidth, h=el.offsetHeight;
-      const x=pxPos(el.style.left)||0;
-      const y=pxPos(el.style.top)||0;
-      el.style.left=(x<innerWidth/2?EDGE:innerWidth-w-EDGE)+'px';
-      el.style.top =clamp(y,0,innerHeight-h-bottomSafe-EDGE)+'px';
-    }
-  }
-  el.addEventListener('pointerup',finish);
-  el.addEventListener('pointercancel',()=>{ drag=null; moved=false; el.classList.remove('dragging'); });
-  /* 键盘/辅助激活：Enter/Space 只产生原生 click（无 pointer 序列），兜底派发 tap */
-  el.addEventListener('click',()=>{
-    if(suppressClick){ suppressClick=false; return; }
-    el.dispatchEvent(new CustomEvent('tap'));
-  });
-}
-
-/* 主题切换（按钮可拖动，拖完不误触） */
-(function(){
-  const btn=document.getElementById('themeBtn');
-  function apply(t){document.documentElement.setAttribute('data-theme',t);
-    btn.setAttribute('aria-label',t==='dark'?'切换到浅色主题':'切换到深色主题');
-    try{localStorage.setItem('xin-ideas-theme',t)}catch(e){}}
-  btn.addEventListener('tap',()=>{
-    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
-  });
-  makeDraggable(btn);
-})();
-
 function cardColor(v){
-  if(v>=8) return "linear-gradient(135deg,#3ECFCF,#6C63FF)";
-  if(v>=6) return "linear-gradient(135deg,#8B7BFF,#6C63FF)";
-  if(v>=4) return "linear-gradient(135deg,#FFB36B,#FFA94D)";
-  return "linear-gradient(135deg,#FF8DA3,#FF6584)";
+  if(typeof v !== "number") return "linear-gradient(135deg,var(--muted-a),var(--muted-b))";  /* 未评分：中性灰 */
+  if(v>=8) return "linear-gradient(135deg,var(--bar1a),var(--bar1b))";
+  if(v>=6) return "linear-gradient(135deg,var(--bar2a),var(--bar2b))";
+  if(v>=4) return "linear-gradient(135deg,var(--bar3a),var(--bar3b))";
+  return "linear-gradient(135deg,var(--bar4a),var(--bar4b))";
 }
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
-const rawBlock = it => (it.raw && String(it.raw).trim()) ? `
-  <div class="c-raw">
-    <span class="raw-tag" role="button" tabindex="0" aria-expanded="false">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.4 11C4.9 11 3.6 12.3 3.6 13.9c0 1.6 1.3 2.9 2.9 2.9.2 0 .4 0 .5-.1-.3 1.6-1.7 2.8-3.4 2.8v1.2c3 0 5.4-2.4 5.4-5.4v-3.2A3.1 3.1 0 0 0 6.4 11z"/><path d="M17.8 11c-1.5 0-2.8 1.3-2.8 2.9 0 1.6 1.3 2.9 2.9 2.9.2 0 .4 0 .5-.1-.3 1.6-1.7 2.8-3.4 2.8v1.2c3 0 5.4-2.4 5.4-5.4v-3.2a3.1 3.1 0 0 0-2.6-3.1z"/></svg>
-      原话
-    </span>
-    <div class="raw-tip"><b>原话</b>${esc(it.raw)}</div>
-  </div>` : '';
+/* 原话浮动提示：桌面跟随卡片，触屏固定底部居中 */
+let tip=null;
+function ensureTip(){ if(!tip){ tip=document.createElement('div'); tip.className='tip'; document.body.appendChild(tip);} return tip; }
+function showTip(origin,el){
+  if(!origin||!origin.trim()) return;
+  const t=ensureTip();
+  t.innerHTML=`<span class="t-label">构思原话</span>${esc(origin)}<span class="t-tap">轻点任意处关闭</span>`;
+  t.classList.add('show'); t.classList.remove('below');
+  if(!window.matchMedia('(hover:none)').matches){
+    const r=el.getBoundingClientRect(), tr=t.getBoundingClientRect();
+    let left=r.left+r.width/2-tr.width/2;
+    left=Math.max(12,Math.min(left,window.innerWidth-tr.width-12));
+    let top=r.top-tr.height-12, below=false;
+    if(top<12){ top=r.bottom+12; below=true; }
+    t.style.left=left+'px'; t.style.top=top+'px'; t.classList.toggle('below',below);
+  }else{
+    t.style.left=''; t.style.top=''; t.classList.remove('below');
+  }
+}
+function hideTip(){ if(tip) tip.classList.remove('show'); }
+window.addEventListener('scroll',hideTip,{passive:true});
+window.addEventListener('resize',hideTip);
 
 function render(){
   const kw=q.value.trim().toLowerCase();
-  let list=IDEAS.filter(it=>{
+  let list=ALL.filter(it=>{
     if(!kw) return true;
-    return (it.title+it.summary+(it.raw||'')+(it.tags||[]).join(' ')).toLowerCase().includes(kw);
+    return (it.title+it.summary+it.tags.join(' ')+it.origin).toLowerCase().includes(kw);
   });
   const s=sort.value;
   list.sort((a,b)=>{
     if(s==='new') return b.ts.localeCompare(a.ts);
-    if(s==='score-desc') return b.score-a.score;
-    if(s==='score-asc') return a.score-b.score;
+    /* 未评分（score=null）不参与分数排序，一律沉底，避免被误当成「最低分」 */
+    if(s==='score-desc' || s==='score-asc'){
+      const an = typeof a.score !== 'number', bn = typeof b.score !== 'number';
+      if(an && bn) return b.ts.localeCompare(a.ts);
+      if(an) return 1;
+      if(bn) return -1;
+      return s==='score-desc' ? b.score-a.score : a.score-b.score;
+    }
     return a.title.localeCompare(b.title,'zh');
   });
 
-  grid.innerHTML=list.map((it,i)=>`
-    <a class="card" href="${esc(it.file)}" target="_blank" rel="noopener" style="animation-delay:${i*0.05}s">
+  grid.innerHTML=list.map((it,i)=>{
+    const hasOrigin = it.origin && it.origin.trim();
+    const corner = hasOrigin ? `<span class="c-origin" title="查看构思原话">原话</span>` : '';
+    return `<div class="card${hasOrigin?' has-origin':''}"${hasOrigin?` data-origin="${esc(it.origin)}"`:''} style="animation-delay:${i*0.05}s">
       <div class="c-top">
         <div class="c-title">${esc(it.title)}</div>
-        <div class="c-score" style="background:${cardColor(it.score)}">${(Number(it.score)||0).toFixed(1)}</div>
+        <div class="c-right"><div class="c-score${typeof it.score === "number" ? "" : " c-score-none"}" style="background:${cardColor(it.score)}">${typeof it.score === "number" ? it.score.toFixed(1) : "未评"}</div>${corner}</div>
       </div>
+      <a class="c-link" href="${it.file}" target="_blank" rel="noopener">
       <div class="c-sum">${esc(it.summary)}</div>
-      <div class="c-tags">${(it.tags||[]).map(t=>`<span class="c-tag">${esc(t)}</span>`).join('')}</div>
-      ${rawBlock(it)}
-      <div class="c-foot">
-        <span class="m-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          ${esc(it.ts)}
-        </span>
-        <span class="go">查看详情
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </span>
-      </div>
-    </a>`).join('');
+      <div class="c-tags">${it.tags.map(t=>`<span class="c-tag">${esc(t)}</span>`).join('')}</div>
+      <div class="c-foot"><span class="c-ts"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>${esc(it.ts)}</span><span class="go">查看详情 ↗</span></div>
+      </a>
+    </div>`;
+  }).join('');
+
+  const canHover = window.matchMedia('(hover:hover)').matches;
+  grid.querySelectorAll('.card').forEach(c=>{
+    if(!c.dataset.origin) return;
+    const origin=c.dataset.origin;
+    if(canHover){
+      c.addEventListener('mouseenter',()=>showTip(origin,c));
+      c.addEventListener('mouseleave',hideTip);
+    }
+    /* 「原话」角标位于 <a> 之外：点它只弹 tip，结构上不可能触发卡片跳转 */
+    const corner=c.querySelector('.c-origin');
+    if(corner) corner.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); showTip(origin,c); });
+  });
 
   empty.style.display=list.length?'none':'block';
 }
 
-/* 原话标签：点击/回车切换展开，阻止跳转 */
-grid.addEventListener('click',e=>{
-  const tag=e.target.closest('.raw-tag');
-  if(!tag){ return; }
-  e.preventDefault();
-  const card=tag.closest('.card');
-  const open=card.classList.toggle('raw-open');
-  tag.setAttribute('aria-expanded',open?'true':'false');
-});
-grid.addEventListener('keydown',e=>{
-  const tag=e.target.closest('.raw-tag');
-  if(!tag || (e.key!=='Enter' && e.key!==' ')){ return; }
-  e.preventDefault();
-  const card=tag.closest('.card');
-  const open=card.classList.toggle('raw-open');
-  tag.setAttribute('aria-expanded',open?'true':'false');
+/* 移动端：点击 tip 之外任意处关闭（点「原话」角标本身不关，由上面重新弹出） */
+document.addEventListener('click',e=>{
+  if(tip && tip.classList.contains('show') && !e.target.closest('.c-origin')) hideTip();
 });
 
-// 统计
-document.getElementById('stat-count').textContent=IDEAS.length;
-const avg=IDEAS.reduce((s,i)=>s+Number(i.score),0)/(IDEAS.length||1);
-document.getElementById('stat-avg').textContent=avg.toFixed(1);
-document.getElementById('stat-top').textContent=IDEAS.length?Math.max(...IDEAS.map(i=>Number(i.score))).toFixed(1):'—';
+// 统计（均分 / 最高分只统计「已评分」条目，未评分不拉低整体统计）
+const SCORED = ALL.filter(i => typeof i.score === 'number');
+document.getElementById('stat-count').textContent = ALL.length;
+const avg = SCORED.length ? SCORED.reduce((s,i)=>s+i.score,0) / SCORED.length : 0;
+document.getElementById('stat-avg').textContent = SCORED.length ? avg.toFixed(1) : '—';
+document.getElementById('stat-top').textContent = SCORED.length ? Math.max(...SCORED.map(i=>i.score)).toFixed(1) : '—';
+
+/* ============ 色调切换：AURORA 蓝紫极光 / ROBOT 冷白机甲 ============
+   选择存 localStorage，明细页与列表页共用；首屏由 <head> 里的内联脚本先应用，
+   这里只负责渲染选择器与响应点击（避免主题闪一下）。 */
+(function () {
+  var KEY = 'xin-ideas-theme';
+  var THEMES = [
+    { id: 'robot',  name: '冷白机甲', en: 'ROBOT',  sw: ['#14171E', '#7A8598', '#FFFFFF'] },
+    { id: 'aurora', name: '蓝紫极光', en: 'AURORA', sw: ['#6C63FF', '#3ECFCF', '#FF6584'] }
+  ];
+  var root = document.documentElement;
+  var pick = document.getElementById('themePick');
+  if (!pick) return;
+  var btn = document.getElementById('themeBtn');
+  var menu = document.getElementById('themeMenu');
+  var swBox = document.getElementById('themeBtnSw');
+  var nameBox = document.getElementById('themeBtnName');
+
+  function findBy(id) {
+    for (var i = 0; i < THEMES.length; i++) if (THEMES[i].id === id) return THEMES[i];
+    return THEMES[0];
+  }
+  function current() {
+    var t = root.getAttribute('data-theme') || window.__XIN_DEFAULT_THEME__ || 'robot';
+    return findBy(t).id;
+  }
+  function swatches(t, cls) {
+    return '<span class="' + cls + '">' + t.sw.map(function (c) {
+      return '<i style="background:' + c + '"></i>';
+    }).join('') + '</span>';
+  }
+  function paint() {
+    var cur = current();
+    var t = findBy(cur);
+    swBox.innerHTML = t.sw.map(function (c) {
+      return '<i style="background:' + c + '"></i>';
+    }).join('');
+    nameBox.textContent = t.name;
+    var opts = THEMES.map(function (x) {
+      return '<button class="theme-opt' + (x.id === cur ? ' on' : '') + '" role="option" data-theme="' + x.id +
+        '" aria-selected="' + (x.id === cur) + '" type="button">' + swatches(x, 'sw') +
+        '<span class="meta"><span class="nm">' + x.name + '</span><span class="en">' + x.en + '</span></span>' +
+        '<span class="ck" aria-hidden="true">✓</span></button>';
+    }).join('');
+    menu.innerHTML = opts;
+  }
+  function apply(id) {
+    root.setAttribute('data-theme', id);
+    try { localStorage.setItem(KEY, id); } catch (e) { /* 隐私模式忽略 */ }
+    paint();
+  }
+  function close() { pick.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+  function open() { pick.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
+
+  btn.addEventListener('click', function (e) {
+    e.preventDefault(); e.stopPropagation();
+    if (pick.classList.contains('open')) close(); else open();
+  });
+  menu.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.theme-opt') : null;
+    if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    apply(b.getAttribute('data-theme'));
+    close();
+  });
+  document.addEventListener('click', function (e) {
+    if (pick.classList.contains('open') && !pick.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+  paint();
+
+  /* 同一后台标签页之间也同步（切页回来不会残留旧主题） */
+  window.addEventListener('storage', function (e) {
+    if (e.key === KEY && e.newValue) apply(e.newValue);
+  });
+})();
+
 
 q.addEventListener('input',render);
 sort.addEventListener('change',render);
